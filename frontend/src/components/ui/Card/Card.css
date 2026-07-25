@@ -1,0 +1,72 @@
+/* ── Card ──────────────────────────────────────────────────── */
+.rf-card {
+  border-radius: var(--radius-xl);
+  transition:
+    transform var(--transition-base),
+    box-shadow var(--transition-base),
+    border-color var(--transition-base);
+  overflow: hidden;
+}
+
+/* ── Variants ─────────────────────────────────────────────── */
+.rf-card--glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow);
+}
+
+.rf-card--default {
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border-default);
+}
+
+.rf-card--outlined {
+  background: transparent;
+  border: 1px solid var(--color-border-default);
+}
+
+.rf-card--elevated {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-default);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ── Hover ────────────────────────────────────────────────── */
+.rf-card--hoverable {
+  cursor: pointer;
+}
+
+.rf-card--hoverable:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--color-border-hover);
+}
+
+/* ── Padding ──────────────────────────────────────────────── */
+.rf-card--pad-none .rf-card__body {
+  padding: 0;
+}
+
+.rf-card--pad-sm .rf-card__body {
+  padding: var(--space-3);
+}
+
+.rf-card--pad-md .rf-card__body {
+  padding: var(--space-5);
+}
+
+.rf-card--pad-lg .rf-card__body {
+  padding: var(--space-8);
+}
+
+/* ── Header / Footer ──────────────────────────────────────── */
+.rf-card__header {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border-default);
+}
+
+.rf-card__footer {
+  padding: var(--space-3) var(--space-5);
+  border-top: 1px solid var(--color-border-default);
+}

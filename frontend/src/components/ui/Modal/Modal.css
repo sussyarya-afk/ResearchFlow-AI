@@ -1,0 +1,81 @@
+/* ── Modal ─────────────────────────────────────────────────── */
+.rf-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+  padding: var(--space-4);
+  animation: fadeIn 200ms ease-out;
+}
+
+.rf-modal {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-xl);
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+  width: 100%;
+}
+
+/* ── Sizes ────────────────────────────────────────────────── */
+.rf-modal--sm { max-width: 400px; }
+.rf-modal--md { max-width: 540px; }
+.rf-modal--lg { max-width: 720px; }
+.rf-modal--xl { max-width: 960px; }
+
+/* ── Header ───────────────────────────────────────────────── */
+.rf-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 1px solid var(--color-border-default);
+}
+
+.rf-modal__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.rf-modal__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  color: var(--color-text-tertiary);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.rf-modal__close:hover {
+  background: rgba(148, 163, 184, 0.1);
+  color: var(--color-text-primary);
+}
+
+/* ── Body ─────────────────────────────────────────────────── */
+.rf-modal__body {
+  padding: var(--space-6);
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* ── Footer ───────────────────────────────────────────────── */
+.rf-modal__footer {
+  padding: var(--space-4) var(--space-6);
+  border-top: 1px solid var(--color-border-default);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}

@@ -1,0 +1,46 @@
+/* ── EmptyState ────────────────────────────────────────────── */
+.rf-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-12) var(--space-6);
+  gap: var(--space-3);
+}
+
+.rf-empty__icon {
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-2);
+  opacity: 0.6;
+}
+
+.rf-empty__icon--default {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-xl);
+  background: var(--glass-bg-light);
+  border: 1px solid var(--glass-border);
+}
+
+.rf-empty__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.rf-empty__description {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  max-width: 360px;
+  line-height: var(--line-height-relaxed);
+  margin: 0;
+}
+
+.rf-empty__action {
+  margin-top: var(--space-4);
+}

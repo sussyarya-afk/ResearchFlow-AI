@@ -1,0 +1,113 @@
+/* ── AuthLayout ────────────────────────────────────────────── */
+.rf-auth-layout {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: var(--space-6);
+}
+
+/* ── Background Orbs ──────────────────────────────────────── */
+.rf-auth-layout__bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.rf-auth-layout__orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.35;
+}
+
+.rf-auth-layout__orb--primary {
+  width: 500px;
+  height: 500px;
+  background: var(--color-primary-600);
+  top: -15%;
+  left: -10%;
+  animation: floatOrb 12s ease-in-out infinite;
+}
+
+.rf-auth-layout__orb--accent {
+  width: 400px;
+  height: 400px;
+  background: var(--color-accent-600);
+  bottom: -10%;
+  right: -8%;
+  animation: floatOrb 15s ease-in-out infinite reverse;
+}
+
+@keyframes floatOrb {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.05); }
+  66% { transform: translate(-20px, 15px) scale(0.95); }
+}
+
+/* ── Container ────────────────────────────────────────────── */
+.rf-auth-layout__container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+/* ── Brand ────────────────────────────────────────────────── */
+.rf-auth-layout__brand {
+  text-align: center;
+}
+
+.rf-auth-layout__logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-decoration: none;
+  color: var(--color-text-primary);
+}
+
+.rf-auth-layout__logo-mark {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: var(--glass-blur);
+}
+
+.rf-auth-layout__logo-text {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  background: linear-gradient(135deg, var(--color-primary-300), var(--color-accent-400));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Card ─────────────────────────────────────────────────── */
+.rf-auth-layout__card {
+  width: 100%;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-2xl);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow);
+  padding: var(--space-8);
+}
+
+/* ── Footer ───────────────────────────────────────────────── */
+.rf-auth-layout__footer {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin: 0;
+}

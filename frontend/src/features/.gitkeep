@@ -1,0 +1,7 @@
+/* ============================================================
+   ResearchFlow AI — Feature Modules
+   ============================================================
+   Add feature-specific modules here (co-located components,
+   hooks, and logic for each feature domain).
+   Example: features/auth/, features/projects/, features/ai/, etc.
+   ============================================================ */

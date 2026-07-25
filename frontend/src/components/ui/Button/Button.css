@@ -1,0 +1,124 @@
+/* ── Button ────────────────────────────────────────────────── */
+.rf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast),
+    border-color var(--transition-fast);
+  user-select: none;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.rf-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.rf-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Sizes ────────────────────────────────────────────────── */
+.rf-btn--sm {
+  height: 32px;
+  padding: 0 var(--space-3);
+  font-size: var(--font-size-xs);
+}
+
+.rf-btn--md {
+  height: 40px;
+  padding: 0 var(--space-5);
+  font-size: var(--font-size-sm);
+}
+
+.rf-btn--lg {
+  height: 48px;
+  padding: 0 var(--space-8);
+  font-size: var(--font-size-base);
+}
+
+/* ── Full width ───────────────────────────────────────────── */
+.rf-btn--full {
+  width: 100%;
+}
+
+/* ── Variants ─────────────────────────────────────────────── */
+.rf-btn--primary {
+  background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600));
+  color: #fff;
+  box-shadow: var(--shadow-sm), var(--shadow-glow-primary);
+}
+
+.rf-btn--primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--color-primary-400), var(--color-primary-500));
+  box-shadow: var(--shadow-md), 0 0 28px rgba(59, 123, 244, 0.35);
+}
+
+.rf-btn--secondary {
+  background: var(--glass-bg);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-default);
+  backdrop-filter: var(--glass-blur);
+}
+
+.rf-btn--secondary:hover:not(:disabled) {
+  background: var(--color-bg-elevated);
+  border-color: var(--color-border-hover);
+}
+
+.rf-btn--ghost {
+  background: transparent;
+  color: var(--color-text-secondary);
+}
+
+.rf-btn--ghost:hover:not(:disabled) {
+  background: rgba(148, 163, 184, 0.08);
+  color: var(--color-text-primary);
+}
+
+.rf-btn--danger {
+  background: linear-gradient(135deg, var(--color-error), #dc2626);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.rf-btn--danger:hover:not(:disabled) {
+  box-shadow: var(--shadow-md), 0 0 20px rgba(239, 68, 68, 0.3);
+}
+
+.rf-btn--accent {
+  background: linear-gradient(135deg, var(--color-accent-500), var(--color-accent-600));
+  color: #fff;
+  box-shadow: var(--shadow-sm), var(--shadow-glow-accent);
+}
+
+.rf-btn--accent:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--color-accent-400), var(--color-accent-500));
+  box-shadow: var(--shadow-md), 0 0 28px rgba(139, 71, 246, 0.35);
+}
+
+/* ── Spinner ──────────────────────────────────────────────── */
+.rf-btn__spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* ── Icon ─────────────────────────────────────────────────── */
+.rf-btn__icon {
+  display: inline-flex;
+  align-items: center;
+  font-size: 1.1em;
+}

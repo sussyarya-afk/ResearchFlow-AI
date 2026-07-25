@@ -1,0 +1,110 @@
+/* ── Auth Form (shared by Login & Register) ───────────────── */
+.rf-auth-form__title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-2);
+  text-align: center;
+}
+
+.rf-auth-form__subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  margin: 0 0 var(--space-8);
+  text-align: center;
+}
+
+.rf-auth-form__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.rf-auth-form__options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--font-size-sm);
+}
+
+.rf-auth-form__remember {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.rf-auth-form__remember input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary-500);
+  cursor: pointer;
+}
+
+.rf-auth-form__forgot {
+  color: var(--color-primary-400);
+  font-size: var(--font-size-sm);
+}
+
+.rf-auth-form__switch {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  text-align: center;
+  margin: var(--space-6) 0 0;
+}
+
+.rf-auth-form__switch a {
+  color: var(--color-primary-400);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ── Social Login & Dividers ──────────────────────────────── */
+.rf-auth-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: var(--space-6) 0;
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.rf-auth-divider::before,
+.rf-auth-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--color-border-default);
+}
+
+.rf-auth-divider::before {
+  margin-right: var(--space-4);
+}
+
+.rf-auth-divider::after {
+  margin-left: var(--space-4);
+}
+
+.rf-auth-social {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.rf-auth-terms {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  text-align: center;
+  margin-top: var(--space-6);
+  line-height: var(--line-height-relaxed);
+}
+
+.rf-auth-terms a {
+  color: var(--color-primary-400);
+  text-decoration: none;
+}
+
+.rf-auth-terms a:hover {
+  text-decoration: underline;
+}

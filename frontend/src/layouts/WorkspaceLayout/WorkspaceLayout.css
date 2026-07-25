@@ -1,0 +1,99 @@
+/* ── WorkspaceLayout ──────────────────────────────────────── */
+.rf-workspace {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Header ───────────────────────────────────────────────── */
+.rf-workspace__header {
+  background: var(--glass-bg);
+  border-bottom: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur);
+  padding: 0 var(--space-8);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+}
+
+.rf-workspace__header-top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-5) 0;
+}
+
+.rf-workspace__back {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-sm);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.rf-workspace__back:hover {
+  color: var(--color-text-primary);
+}
+
+.rf-workspace__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.rf-workspace__title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.rf-workspace__badge {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  padding: var(--space-1) var(--space-2);
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--color-success);
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+/* ── Tabs ─────────────────────────────────────────────────── */
+.rf-workspace__tabs {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.rf-workspace__tab {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-tertiary);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+  margin-bottom: -1px;
+}
+
+.rf-workspace__tab:hover {
+  color: var(--color-text-secondary);
+}
+
+.rf-workspace__tab--active {
+  color: var(--color-primary-400);
+  border-bottom-color: var(--color-primary-400);
+}
+
+/* ── Content ──────────────────────────────────────────────── */
+.rf-workspace__content {
+  flex: 1;
+  padding: var(--space-8);
+  max-width: var(--max-content-width);
+  width: 100%;
+  margin: 0 auto;
+}
