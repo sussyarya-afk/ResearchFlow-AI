@@ -1,0 +1,66 @@
+.rf-quick-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rf-quick-action-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.rf-quick-action-card__btn {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 16px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.rf-quick-action-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.rf-quick-action-card__icon--primary {
+  background-color: rgba(var(--color-primary-400-rgb), 0.1);
+  color: var(--color-primary-400);
+}
+
+.rf-quick-action-card__icon--success {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--color-success);
+}
+
+.rf-quick-action-card__icon--accent {
+  background-color: rgba(var(--color-accent-400-rgb), 0.1);
+  color: var(--color-accent-400);
+}
+
+.rf-quick-action-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rf-quick-action-card__title {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.rf-quick-action-card__description {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin: 0;
+}

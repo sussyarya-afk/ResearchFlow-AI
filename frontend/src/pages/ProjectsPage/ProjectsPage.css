@@ -1,0 +1,73 @@
+/* ── Projects Page ────────────────────────────────────────── */
+.rf-projects-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* ── Toolbar ── */
+.rf-projects-page__toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+/* ── Sort control ── */
+.rf-projects-page__sort {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.rf-projects-page__sort-icon {
+  position: absolute;
+  left: var(--space-3);
+  color: var(--color-text-tertiary);
+  pointer-events: none;
+}
+
+.rf-projects-page__sort-select {
+  appearance: none;
+  padding: 0.625rem var(--space-4) 0.625rem calc(var(--space-3) + 14px + var(--space-2));
+  background: var(--glass-bg);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-family);
+  cursor: pointer;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.rf-projects-page__sort-select:focus,
+.rf-projects-page__sort-select:hover {
+  border-color: var(--color-border-hover);
+  color: var(--color-text-primary);
+}
+
+/* ── Result count ── */
+.rf-projects-page__result-count {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  margin: 0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .rf-projects-page__toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .rf-projects-page__sort {
+    margin-left: 0;
+  }
+
+  .rf-projects-page__sort-select {
+    width: 100%;
+  }
+}

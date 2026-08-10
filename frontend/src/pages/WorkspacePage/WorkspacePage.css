@@ -1,0 +1,60 @@
+/* ── Workspace Page — 3-Panel Grid ─────────────────────────── */
+.rf-workspace-page {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
+  /* Panel widths via CSS custom properties */
+  --ws-left-width: 280px;
+  --ws-right-width: 320px;
+}
+
+/* When right panel is hidden */
+.rf-workspace-page--no-right .rf-chat-panel {
+  border-right: none;
+}
+
+/* ── Responsive ── */
+
+/* Tablet: collapse right panel by default, left panel narrower */
+@media (max-width: 1100px) {
+  .rf-workspace-page {
+    --ws-left-width: 240px;
+    --ws-right-width: 280px;
+  }
+}
+
+/* Mobile: stack vertically, show only chat */
+@media (max-width: 768px) {
+  .rf-workspace-page {
+    flex-direction: column;
+  }
+
+  .rf-ws-left {
+    width: 100% !important;
+    min-width: unset !important;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border-default);
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    max-height: 120px;
+  }
+
+  .rf-ws-right {
+    display: none;
+  }
+
+  .rf-ws-left__content {
+    display: none;
+  }
+
+  .rf-ws-left__footer {
+    border-top: none;
+    border-left: 1px solid var(--color-border-default);
+    padding: var(--space-2);
+    min-width: fit-content;
+  }
+}

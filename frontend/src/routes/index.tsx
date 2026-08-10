@@ -12,6 +12,10 @@ import { WorkspacePage } from '@/pages/WorkspacePage';
 import { ProfilePage } from '@/pages/ProfilePage';
 import { SettingsPage } from '@/pages/SettingsPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
+import { ProjectsPage } from '@/pages/ProjectsPage';
+import { AgentsPage } from '@/pages/AgentsPage';
+import { DocumentsPage } from '@/pages/DocumentsPage';
+import { FavoritesPage } from '@/pages/FavoritesPage';
 
 export const router = createBrowserRouter([
   /* ── Public ─────────────────────────────────────────────── */
@@ -34,6 +38,10 @@ export const router = createBrowserRouter([
     element: <DashboardLayout />,
     children: [
       { path: '/dashboard', element: <DashboardPage /> },
+      { path: '/projects', element: <ProjectsPage /> },
+      { path: '/agents', element: <AgentsPage /> },
+      { path: '/documents', element: <DocumentsPage /> },
+      { path: '/favorites', element: <FavoritesPage /> },
       { path: '/profile', element: <ProfilePage /> },
       { path: '/settings', element: <SettingsPage /> },
     ],
@@ -54,3 +62,4 @@ export const router = createBrowserRouter([
     element: <NotFoundPage />,
   },
 ]);
+

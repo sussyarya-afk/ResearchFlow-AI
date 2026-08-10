@@ -1,0 +1,10 @@
+.rf-projects-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-4);
+}
+
+.rf-projects-list > [role='listitem'] {
+  display: flex;
+  flex-direction: column;
+}

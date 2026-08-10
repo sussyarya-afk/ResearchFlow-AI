@@ -1,0 +1,109 @@
+/* ── Message Bubble ───────────────────────────────────────── */
+.rf-msg {
+  display: flex;
+  gap: var(--space-3);
+  animation: fadeInUp 250ms ease-out both;
+}
+
+.rf-msg--user {
+  flex-direction: row-reverse;
+}
+
+/* ── Avatar ── */
+.rf-msg__avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.rf-msg--user .rf-msg__avatar {
+  background: linear-gradient(135deg, var(--color-primary-500), var(--color-accent-500));
+  color: #fff;
+}
+
+.rf-msg--ai .rf-msg__avatar {
+  background: linear-gradient(135deg, var(--color-accent-700), var(--color-primary-700));
+  border: 1px solid var(--color-border-default);
+  color: var(--color-primary-300);
+}
+
+/* ── Body ── */
+.rf-msg__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-width: 80%;
+}
+
+.rf-msg--user .rf-msg__body {
+  align-items: flex-end;
+}
+
+.rf-msg--ai .rf-msg__body {
+  align-items: flex-start;
+}
+
+/* ── Header ── */
+.rf-msg__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.rf-msg--user .rf-msg__header {
+  flex-direction: row-reverse;
+}
+
+.rf-msg__sender {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+}
+
+.rf-msg__time {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* ── Bubble ── */
+.rf-msg__bubble {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-xl);
+  font-size: var(--font-size-sm);
+  line-height: 1.65;
+  max-width: 100%;
+}
+
+.rf-msg__bubble--user {
+  background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-700));
+  color: #fff;
+  border-bottom-right-radius: var(--radius-sm);
+}
+
+.rf-msg__bubble--ai {
+  background: var(--glass-bg);
+  border: 1px solid var(--color-border-default);
+  color: var(--color-text-primary);
+  border-bottom-left-radius: var(--radius-sm);
+}
+
+.rf-msg__para {
+  margin: 0;
+}
+
+.rf-msg__para + .rf-msg__para {
+  margin-top: var(--space-3);
+}
+
+/* ── Timeline below AI bubble ── */
+.rf-msg__timeline {
+  width: 100%;
+  margin-top: var(--space-2);
+}

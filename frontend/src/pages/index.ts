@@ -6,3 +6,7 @@ export { WorkspacePage } from './WorkspacePage';
 export { ProfilePage } from './ProfilePage';
 export { SettingsPage } from './SettingsPage';
 export { NotFoundPage } from './NotFoundPage';
+export { ProjectsPage } from './ProjectsPage';
+export { AgentsPage } from './AgentsPage';
+export { DocumentsPage } from './DocumentsPage';
+export { FavoritesPage } from './FavoritesPage';

@@ -1,0 +1,36 @@
+.rf-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-full);
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.rf-badge--default {
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+}
+
+.rf-badge--primary {
+  background: rgba(59, 123, 244, 0.15);
+  color: var(--color-primary-400);
+}
+
+.rf-badge--success {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--color-success);
+}
+
+.rf-badge--warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--color-warning);
+}
+
+.rf-badge--error {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--color-error);
+}

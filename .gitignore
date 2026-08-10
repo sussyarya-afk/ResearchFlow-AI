@@ -1,0 +1,30 @@
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# IDEs
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# App specific
+uploads/
+chroma/
+data/
+*.db
+*.sqlite

@@ -1,0 +1,47 @@
+.rf-projects-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.rf-projects-header__info {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.rf-projects-header__title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.rf-projects-header__count {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  font-weight: var(--font-weight-medium);
+  background: rgba(var(--color-bg-elevated-rgb), 0.5);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+}
+
+.rf-projects-header__btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 640px) {
+  .rf-projects-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .rf-projects-header__btn {
+    width: 100%;
+  }
+}

@@ -1,0 +1,95 @@
+.rf-continue-working {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background: linear-gradient(135deg, rgba(var(--color-bg-elevated-rgb), 0.8), rgba(var(--color-bg-base-rgb), 0.9));
+  border: 1px solid var(--color-border);
+  position: relative;
+  overflow: hidden;
+}
+
+.rf-continue-working::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--color-primary-400), var(--color-accent-400));
+}
+
+.rf-continue-working__content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.rf-continue-working__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.rf-continue-working__subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.rf-continue-working__meta {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  margin-top: 4px;
+}
+
+.rf-continue-working__progress {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rf-continue-working__progress-bar {
+  flex: 1;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.rf-continue-working__progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary-400), var(--color-accent-400));
+  border-radius: var(--radius-full);
+}
+
+.rf-continue-working__progress-text {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.rf-continue-working__action {
+  display: flex;
+  align-items: flex-end;
+}
+
+.rf-continue-working__btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (min-width: 768px) {
+  .rf-continue-working {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .rf-continue-working__action {
+    margin-left: 24px;
+  }
+}

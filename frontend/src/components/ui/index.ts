@@ -5,3 +5,4 @@ export { Modal } from './Modal';
 export { Loader } from './Loader';
 export { EmptyState } from './EmptyState';
 export { ErrorState } from './ErrorState';
+export { Badge } from './Badge';

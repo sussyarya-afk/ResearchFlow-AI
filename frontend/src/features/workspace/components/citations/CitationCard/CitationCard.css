@@ -1,0 +1,114 @@
+/* ── Citation Card ────────────────────────────────────────── */
+.rf-citation-card {
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  animation: fadeInUp 200ms ease-out both;
+}
+
+.rf-citation-card:hover {
+  border-color: var(--color-border-hover);
+  box-shadow: var(--shadow-md);
+}
+
+/* ── Source row ── */
+.rf-citation-card__source {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.rf-citation-card__icon {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
+  background: rgba(59, 123, 244, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary-400);
+  flex-shrink: 0;
+}
+
+.rf-citation-card__source-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rf-citation-card__doc-name {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rf-citation-card__page {
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+}
+
+/* ── Confidence ── */
+.rf-citation-card__confidence {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  flex-shrink: 0;
+}
+
+.rf-citation-card__conf-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+}
+
+/* ── Excerpt ── */
+.rf-citation-card__excerpt {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  background: rgba(148, 163, 184, 0.04);
+  border-left: 2px solid var(--color-border-hover);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-style: italic;
+}
+
+/* ── Actions ── */
+.rf-citation-card__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.rf-citation-card__open-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 3px var(--space-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-default);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.rf-citation-card__open-btn:hover {
+  border-color: var(--color-primary-500);
+  color: var(--color-primary-400);
+  background: rgba(59, 123, 244, 0.06);
+}

@@ -16,7 +16,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
-  max-width: 640px;
+  max-width: 720px;
 }
 
 /* ── Section ──────────────────────────────────────────────── */
@@ -29,6 +29,12 @@
   margin-bottom: var(--space-5);
   padding-bottom: var(--space-4);
   border-bottom: 1px solid var(--color-border-default);
+}
+
+.rf-settings-section__header--flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .rf-settings-section__title {
@@ -46,6 +52,216 @@
   font-size: var(--font-size-sm);
   color: var(--color-text-tertiary);
   margin: 0;
+}
+
+/* ── AI Active Summary ────────────────────────────────────── */
+.rf-llm-active-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--glass-bg-light);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-5);
+}
+
+.rf-llm-active-summary__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.rf-llm-active-summary__label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.rf-llm-active-summary__value {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.rf-llm-active-summary__model {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--font-size-xs);
+  color: var(--color-primary-400);
+  background: rgba(99, 102, 241, 0.1);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  align-self: flex-start;
+}
+
+/* ── Status Badges ────────────────────────────────────────── */
+.rf-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.rf-status-badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.rf-status-badge--connected {
+  background: rgba(34, 197, 94, 0.12);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+.rf-status-badge--connected .rf-status-badge__dot {
+  background: #22c55e;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);
+}
+
+.rf-status-badge--warning {
+  background: rgba(234, 179, 8, 0.12);
+  color: #facc15;
+  border: 1px solid rgba(234, 179, 8, 0.25);
+}
+.rf-status-badge--warning .rf-status-badge__dot {
+  background: #eab308;
+}
+
+.rf-status-badge--error {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+.rf-status-badge--error .rf-status-badge__dot {
+  background: #ef4444;
+}
+
+.rf-status-badge--neutral {
+  background: var(--glass-bg-light);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-default);
+}
+.rf-status-badge--neutral .rf-status-badge__dot {
+  background: var(--color-text-tertiary);
+}
+
+/* ── Provider Cards Grid ──────────────────────────────────── */
+.rf-provider-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+
+.rf-provider-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--space-4);
+  background: var(--glass-bg-light);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.rf-provider-card:hover {
+  border-color: var(--color-primary-500);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.rf-provider-card--selected {
+  border-color: var(--color-primary-500);
+  background: rgba(99, 102, 241, 0.08);
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.15);
+}
+
+.rf-provider-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.rf-provider-card__title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.rf-provider-card__name {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.rf-provider-card__icon--gemini {
+  color: #a855f7;
+}
+
+.rf-provider-card__icon--nvidia {
+  color: #76b900;
+}
+
+.rf-provider-card__icon--ollama {
+  color: #38bdf8;
+}
+
+.rf-provider-card__radio {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border-default);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rf-provider-card--selected .rf-provider-card__radio {
+  border-color: var(--color-primary-500);
+}
+
+.rf-provider-card__radio-inner {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: transparent;
+  transition: background var(--transition-fast);
+}
+
+.rf-provider-card__radio-inner--active {
+  background: var(--color-primary-500);
+}
+
+.rf-provider-card__model-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.rf-provider-card__model-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+.rf-provider-card__model-name {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.rf-provider-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: var(--space-2);
 }
 
 /* ── Item ─────────────────────────────────────────────────── */
