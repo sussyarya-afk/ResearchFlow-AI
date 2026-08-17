@@ -1,33 +1,51 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { documentService } from '../services/documentService';
-import { streamChatMessage } from '../services/workspaceService';
-import {
-  MOCK_PROJECT,
-  MOCK_MESSAGES,
-  MOCK_CITATIONS,
-} from '../mockData';
+import { apiClient } from '@/services/api';
+import { buildProjectEventsUrl, fetchMessages, fetchWorkspaceProject, streamChatMessage } from '../services/workspaceService';
 import type {
   ChatMessage,
   WorkspaceDocument,
   Citation,
   AgentTimeline,
   AgentStep,
+  WorkspaceProject,
 } from '../types';
+
+export interface WorkspaceNote {
+  id: string;
+  project_id?: string;
+  content: string;
+  created_at: string;
+  updated_at?: string;
+}
 
 export function useWorkspace() {
   const { projectId } = useParams<{ projectId: string }>();
+  const [project, setProject] = useState<WorkspaceProject>({
+    id: projectId || '',
+    name: 'Workspace',
+    description: '',
+    status: 'Active',
+    documentCount: 0,
+    chatCount: 0,
+    updatedAt: '',
+  });
   const [documents, setDocuments] = useState<WorkspaceDocument[]>([]);
-  const [messages, setMessages] = useState<ChatMessage[]>(MOCK_MESSAGES);
+  const [notes, setNotes] = useState<WorkspaceNote[]>([]);
+  const [notesLoading, setNotesLoading] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeDocumentId, setActiveDocumentId] = useState<string>('');
   const [activePageNumber, setActivePageNumber] = useState<number>(1);
+  const [highlightText, setHighlightText] = useState<string>('');
   const [zoomLevel, setZoomLevel] = useState(100);
   const [leftTab, setLeftTab] = useState<'documents' | 'notes' | 'agents' | 'sources'>('documents');
   const [timeline, setTimeline] = useState<AgentTimeline>({ steps: [] });
   const [documentsLoading, setDocumentsLoading] = useState(false);
   const [documentsError, setDocumentsError] = useState<string | null>(null);
+  const [workspaceError, setWorkspaceError] = useState<string | null>(null);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -65,7 +83,7 @@ export function useWorkspace() {
   useEffect(() => {
     if (!projectId) return;
 
-    const eventSource = new EventSource(`/api/v1/projects/${projectId}/events`);
+    const eventSource = new EventSource(buildProjectEventsUrl(projectId));
     
     eventSource.onmessage = (e) => {
       try {
@@ -82,6 +100,35 @@ export function useWorkspace() {
       eventSource.close();
     };
   }, [projectId, handleTimelineEvent]);
+
+  useEffect(() => {
+    if (!projectId) return;
+
+    const currentProjectId = projectId;
+    let cancelled = false;
+    async function loadWorkspace() {
+      try {
+        setWorkspaceError(null);
+        const [projectData, messageData] = await Promise.all([
+          fetchWorkspaceProject(currentProjectId),
+          fetchMessages(currentProjectId),
+        ]);
+        if (!cancelled) {
+          setProject(projectData);
+          setMessages(messageData);
+        }
+      } catch (err: any) {
+        if (!cancelled) {
+          setWorkspaceError(err?.message || 'Failed to load workspace.');
+        }
+      }
+    }
+
+    loadWorkspace();
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId]);
 
   const fetchDocuments = useCallback(async () => {
     if (!projectId) return;
@@ -102,12 +149,72 @@ export function useWorkspace() {
     }
   }, [projectId, activeDocumentId]);
 
+  const fetchNotes = useCallback(async () => {
+    if (!projectId) return;
+    setNotesLoading(true);
+    try {
+      const data = await apiClient.getNotes(projectId);
+      if (Array.isArray(data)) {
+        setNotes(data);
+      }
+    } catch (err) {
+      console.warn('Failed to load notes:', err);
+    } finally {
+      setNotesLoading(false);
+    }
+  }, [projectId]);
+
   useEffect(() => {
     fetchDocuments();
-  }, [fetchDocuments]);
+    fetchNotes();
+  }, [fetchDocuments, fetchNotes]);
+
+  const createNote = async (content: string) => {
+    if (!projectId || !content.trim()) return;
+    try {
+      const created = await apiClient.createNote(projectId, content.trim());
+      setNotes(prev => [created, ...prev]);
+    } catch (err) {
+      console.error('Failed to create note:', err);
+    }
+  };
+
+  const updateNote = async (noteId: string, content: string) => {
+    if (!projectId || !content.trim()) return;
+    try {
+      const updated = await apiClient.updateNote(projectId, noteId, content.trim());
+      setNotes(prev => prev.map(n => n.id === noteId ? updated : n));
+    } catch (err) {
+      console.error('Failed to update note:', err);
+    }
+  };
+
+  const deleteNote = async (noteId: string) => {
+    if (!projectId) return;
+    try {
+      await apiClient.deleteNote(projectId, noteId);
+      setNotes(prev => prev.filter(n => n.id !== noteId));
+    } catch (err) {
+      console.error('Failed to delete note:', err);
+    }
+  };
+
+  const deleteDocument = async (documentId: string) => {
+    if (!projectId) return;
+    try {
+      await documentService.deleteDocument(projectId, documentId);
+      setDocuments(prev => prev.filter(d => d.id !== documentId));
+      if (activeDocumentId === documentId) {
+        const remaining = documents.filter(d => d.id !== documentId);
+        setActiveDocumentId(remaining.length > 0 ? remaining[0].id : '');
+      }
+    } catch (err) {
+      console.error('Failed to delete document:', err);
+    }
+  };
 
   const selectedDocument = documents.find(d => d.id === activeDocumentId) ?? documents[0];
-  const citations: Citation[] = MOCK_CITATIONS;
+  const citations: Citation[] = messages.flatMap(message => message.citations || []);
 
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -191,6 +298,11 @@ export function useWorkspace() {
     setIsGenerating(false);
   }, []);
 
+  const clearChat = useCallback(() => {
+    setMessages([]);
+    setTimeline({ steps: [] });
+  }, []);
+
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === 'Enter' && !e.shiftKey) {
@@ -204,19 +316,32 @@ export function useWorkspace() {
   const zoomIn = useCallback(() => setZoomLevel(z => Math.min(z + 25, 200)), []);
   const zoomOut = useCallback(() => setZoomLevel(z => Math.max(z - 25, 50)), []);
 
-  const openDocument = useCallback((documentId: string, pageNumber: number) => {
+  const openDocument = useCallback((documentId: string, pageNumber: number, excerpt?: string) => {
     setActiveDocumentId(documentId);
     setActivePageNumber(pageNumber);
+    if (excerpt) {
+      setHighlightText(excerpt);
+    }
   }, []);
 
   return {
     // Project
-    project: MOCK_PROJECT,
+    project,
+    workspaceError,
     documents,
     documentsLoading,
     documentsError,
     selectedDocument,
     fetchDocuments,
+    deleteDocument,
+
+    // Notes
+    notes,
+    notesLoading,
+    fetchNotes,
+    createNote,
+    updateNote,
+    deleteNote,
 
     // Chat
     messages,
@@ -225,6 +350,7 @@ export function useWorkspace() {
     isGenerating,
     sendMessage,
     stopGeneration,
+    clearChat,
     handleKeyDown,
     chatEndRef,
 
@@ -240,6 +366,8 @@ export function useWorkspace() {
     setActiveDocumentId,
     activePageNumber,
     setActivePageNumber,
+    highlightText,
+    setHighlightText,
     openDocument,
 
     // Left panel nav

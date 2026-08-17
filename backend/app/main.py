@@ -3,11 +3,15 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from sqlalchemy import text
 
 from app.core.config import settings, ALLOWED_ORIGINS
+from app.core.database import async_session_maker
 from app.core.logging import setup_logging
 from app.api.routes import api_router
 from app.services.embedding import embedding_service
+from app.services.retrieval import retrieval_service
+from app.services.llm.factory import LLMFactory
 
 # Initialise structured logging before anything else runs
 setup_logging()
@@ -43,10 +47,11 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS — restrict to known frontend origins in production
+# Phase 11: Never allow wildcard origins when credentials=True — RFC violation.
+# Use the explicit ALLOWED_ORIGINS list in all environments.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS if settings.ENVIRONMENT == "production" else ["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -59,14 +64,30 @@ app.include_router(api_router, prefix="/api/v1")
 async def health_check():
     """
     Health check endpoint.
-    Returns application status, environment, and embedding model readiness.
+    Verifies database, vector store, embedding model, and selected LLM status.
     """
+    db_status = "error"
+    try:
+        async with async_session_maker() as session:
+            await session.execute(text("SELECT 1"))
+        db_status = "connected"
+    except Exception as exc:
+        logger.error("Health check database failure: %s", exc)
+
+    vector_status = "healthy" if retrieval_service._healthy else "error"
+    provider = LLMFactory.get_provider()
+    provider_status = await provider.check_connection()
+    critical_ok = db_status == "connected" and vector_status == "healthy" and embedding_service.model is not None
+
     return JSONResponse({
-        "status": "ok",
+        "status": "ok" if critical_ok else "degraded",
         "environment": settings.ENVIRONMENT,
+        "database": db_status,
+        "vector_store": vector_status,
         "embedding_model": {
             "loaded": embedding_service.model is not None,
             "name": embedding_service.model_name,
         },
-        "llm_provider": settings.LLM_PROVIDER,
+        "llm_provider": provider.provider_name,
+        "llm_status": provider_status.get("status"),
     })

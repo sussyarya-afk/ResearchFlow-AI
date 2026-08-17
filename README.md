@@ -1,91 +1,120 @@
 # ResearchFlow AI
 
-ResearchFlow AI is an advanced research and document analysis platform designed to streamline knowledge extraction, organization, and comprehension.
+ResearchFlow AI is a FastAPI + React/Vite research workspace for uploading PDFs, indexing their text into ChromaDB, and asking document-grounded questions through Gemini, NVIDIA, or Ollama.
 
-## The Problem
-Researchers, analysts, and students often struggle with information overload when dealing with numerous academic papers, technical documentation, and long-form articles. Existing tools either lack intelligent querying capabilities or fail to maintain a coherent workflow across multiple documents.
+## Architecture
 
-## Main Features
-- **Document Management**: Upload and organize PDFs seamlessly.
-- **Intelligent RAG (Retrieval-Augmented Generation)**: Ask complex questions and get answers rooted directly in your uploaded documents.
-- **Multi-LLM Support**: Choose between cutting-edge models for generating responses.
-- **Advanced Citations**: Every claim is backed by specific citations to the source text.
-- **Streaming Responses**: Real-time answer generation.
-- **Live Agent Timeline**: See the AI's step-by-step reasoning and retrieval process in real-time.
-- **Workspace Integration**: Split-pane view for side-by-side reading and chatting.
+- Backend: FastAPI, async SQLAlchemy, Alembic, PostgreSQL, JWT auth, PyMuPDF PDF extraction, sentence-transformers embeddings, ChromaDB vector search, SSE timeline events.
+- Frontend: React, Vite, TypeScript, three-panel workspace UI, streaming chat, citations, project dashboard.
+- Persistence: PostgreSQL stores users, projects, documents, chunks, chat history, citations, and notes. ChromaDB stores chunk vectors and retrieval metadata. Uploaded PDFs live on disk or a mounted volume.
 
-## RAG Architecture & Application Flow
-ResearchFlow AI uses a sophisticated Retrieval-Augmented Generation pipeline:
-1. **Upload & Processing**: PDFs are parsed, chunked, and embedded using Sentence Transformers.
-2. **Vector Storage**: Embeddings are stored in ChromaDB for high-speed similarity search.
-3. **Querying**: User queries are embedded and matched against the vector database to retrieve the most relevant document chunks.
-4. **Generation**: The context (retrieved chunks) and query are passed to the selected LLM, which streams back a comprehensive answer with inline citations.
+## RAG Flow
 
-## Tech Stack
-### Backend
-- **Framework**: FastAPI (Python)
-- **Database**: PostgreSQL (Relational Data), ChromaDB (Vector Data)
-- **Embeddings**: Sentence Transformers
-- **LLM Integrations**: Gemini, NVIDIA, Ollama
+PDF upload -> PyMuPDF page extraction -> paragraph-aware chunks -> sentence-transformer embeddings -> ChromaDB upsert with project/document/page metadata -> query embedding -> ChromaDB filtered retrieval -> grounded prompt -> selected LLM provider -> streamed answer -> citations saved with chat history.
 
-### Frontend
-- **Framework**: React + Vite + TypeScript
-- **Styling**: Vanilla CSS with modern aesthetics
+## Prerequisites
 
-## LLM Providers
-- **Gemini**: Google's highly capable model for rapid and accurate reasoning.
-- **NVIDIA**: High-performance enterprise AI models.
-- **Ollama**: Local, privacy-first inference for open-source models.
-
-## Installation Instructions
-
-### Prerequisites
-- Node.js 18+
 - Python 3.10+
-- PostgreSQL
-- Git
+- Node.js 20+
+- PostgreSQL 14+
+- Docker Desktop, optional for container deployment
+- One configured LLM provider: `GEMINI_API_KEY`, `NVIDIA_API_KEY`, or reachable `OLLAMA_URL`
 
-### 1. Clone the repository
+## Environment
+
+Copy `backend/.env.example` to `backend/.env` for local development. Never commit real `.env` files.
+
+Important variables:
+
 ```bash
-git clone https://github.com/sussyarya-afk/ResearchFlow-AI.git
-cd ResearchFlow-AI
+ENVIRONMENT=production
+DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/researchflow
+SECRET_KEY=CHANGE_ME_TO_A_LONG_RANDOM_SECRET
+FRONTEND_ORIGINS=http://localhost:5173
+LLM_PROVIDER=nvidia
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-1.5-flash
+NVIDIA_API_KEY=
+NVIDIA_MODEL=meta/llama-3.3-70b-instruct
+OLLAMA_URL=http://localhost:11434
+OLLAMA_MODEL=llama3
+MAX_UPLOAD_SIZE_MB=50
 ```
 
-### 2. Environment Setup
-Create a `.env` file in the `backend/` directory by copying `.env.example`:
-```bash
-cp backend/.env.example backend/.env
-```
-Fill in the necessary API keys (e.g., Gemini, NVIDIA) and your PostgreSQL connection string.
+Providers without credentials report `not_configured`; they do not return fake answers.
 
-### 3. Backend Setup
+## Local Setup
+
+Backend:
+
 ```bash
 cd backend
 python -m venv venv
-source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+venv\Scripts\activate
 pip install -r requirements.txt
-# Run database migrations if applicable
+alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
-### 4. Frontend Setup
+Frontend:
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-## Project Structure
-```text
-ResearchFlow-AI/
-├── backend/          # FastAPI server, ChromaDB integrations, LLM providers
-├── frontend/         # React application, components, pages
-├── README.md         # Documentation
-└── .gitignore        # Excludes sensitive data (e.g., .env, local DBs, node_modules)
+Set `VITE_API_URL=http://localhost:8000/api/v1` if the frontend cannot infer the backend URL.
+
+## Database
+
+The production database is PostgreSQL. Run migrations with:
+
+```bash
+cd backend
+alembic upgrade head
 ```
 
-## Future Roadmap
-- Collaborative workspaces for teams
-- Integration with external knowledge bases (e.g., Notion, Google Drive)
-- Advanced graph-based retrieval (GraphRAG)
-- Automated literature review generation
+The current migration chain includes legacy placeholders for previously referenced revisions plus a baseline schema for clean installs.
+
+## Docker
+
+```bash
+docker compose up --build
+```
+
+The compose stack provides PostgreSQL, the FastAPI backend, persistent upload/vector volumes, and an Nginx-served frontend. Supply secrets through environment variables or a local uncommitted `.env`.
+
+## Verification
+
+Backend:
+
+```bash
+cd backend
+python -m compileall app
+pytest
+alembic upgrade head
+```
+
+Frontend:
+
+```bash
+cd frontend
+npx tsc --noEmit
+npm run build
+```
+
+Docker:
+
+```bash
+docker compose config
+docker compose build
+```
+
+## Troubleshooting
+
+- Login fails with `Failed to fetch`: confirm the backend is running, CORS includes the frontend origin, and PostgreSQL is reachable by `DATABASE_URL`.
+- Upload fails during indexing: verify the embedding model can load and `chroma_db/` is writable.
+- Chat fails with provider not configured: set the selected provider's API key or use a reachable Ollama server.
+- SSE timeline does not connect: confirm the frontend uses `VITE_API_URL` and the user is authenticated.
+- Docker commands fail: install Docker Desktop and ensure `docker` is on PATH.

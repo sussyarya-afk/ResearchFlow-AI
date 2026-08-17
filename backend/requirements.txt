@@ -1,18 +1,36 @@
+# ── Core framework ────────────────────────────────────────────────────────────
 fastapi
-uvicorn
+uvicorn[standard]
+
+# ── Database ──────────────────────────────────────────────────────────────────
 sqlalchemy>=2.0.25
 alembic>=1.13.1
+
+# Production (PostgreSQL async driver — set DATABASE_URL=postgresql+psycopg://...)
 psycopg[binary]
+
+# Development (SQLite async driver — used when DATABASE_URL=sqlite+aiosqlite://...)
+aiosqlite
+
+# ── Auth & security ───────────────────────────────────────────────────────────
 pydantic
 pydantic-settings
+pydantic[email]
 passlib[bcrypt]
+bcrypt<5
 pyjwt
 python-multipart
-pydantic[email]
+python-dotenv
+
+# ── PDF processing ────────────────────────────────────────────────────────────
 pymupdf
 
+# ── Embeddings ────────────────────────────────────────────────────────────────
 sentence-transformers
 
+# ── Vector store ──────────────────────────────────────────────────────────────
 chromadb
+
+# ── LLM providers ────────────────────────────────────────────────────────────
 google-generativeai
 httpx

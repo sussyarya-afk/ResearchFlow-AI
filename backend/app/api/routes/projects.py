@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Annotated
 
 from app.core.database import get_db
-from app.api.dependencies import get_current_user
+from app.api.dependencies import get_current_user, get_current_user_ws
 from app.models.user import User
 from app.schemas.project import ProjectCreate, ProjectUpdate, ProjectResponse
 from app.services.project import ProjectService
@@ -74,12 +74,18 @@ async def delete_project(
 @router.get("/{project_id}/events")
 async def stream_project_events(
     project_id: UUID,
-    current_user: Annotated[User, Depends(get_current_user)],
+    session: Annotated[AsyncSession, Depends(get_db)],
+    # Phase 12: use query-param token since EventSource cannot set Authorization headers
+    current_user: Annotated[User, Depends(get_current_user_ws)],
 ):
     """
     Stream live timeline events for a project via Server-Sent Events (SSE).
-    The connection is cleaned up automatically on client disconnect.
+    Auth: pass JWT as ?token=<jwt> query param.
+    Phase 13: ownership is verified before subscribing.
     """
+    # Phase 13: verify the user owns this project before subscribing
+    await ProjectService.get_project(session, project_id, current_user.id)
+
     proj_id_str = str(project_id)
     queue = event_bus.subscribe(proj_id_str)
     logger.info(f"SSE client connected | project={proj_id_str} user={current_user.id}")
@@ -91,7 +97,6 @@ async def stream_project_events(
                 payload = json.dumps({"type": "timeline_event", "event": event})
                 yield f"data: {payload}\n\n"
         except asyncio.CancelledError:
-            # Client disconnected — this is normal, not an error
             logger.info(
                 f"SSE client disconnected (CancelledError) | project={proj_id_str} user={current_user.id}"
             )
@@ -109,3 +114,4 @@ async def stream_project_events(
             logger.info(f"SSE queue cleaned up | project={proj_id_str}")
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
+

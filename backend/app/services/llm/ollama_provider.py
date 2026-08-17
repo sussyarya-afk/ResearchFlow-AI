@@ -42,7 +42,7 @@ class OllamaProvider(BaseLLMProvider):
         except Exception as e:
             return {
                 "status": "not_configured",
-                "message": f"Ollama server not reachable at {self.ollama_url} ({str(e)}). Using mock fallback.",
+                "message": f"Ollama server not reachable at {self.ollama_url} ({str(e)}).",
                 "model": self.model_name
             }
 
@@ -58,10 +58,12 @@ class OllamaProvider(BaseLLMProvider):
                 if res.status_code == 200:
                     data = res.json()
                     return data.get("response", "")
+                res.raise_for_status()
         except Exception as e:
-            logger.warning(f"Ollama call failed ({str(e)}), returning mock response.")
-            
-        return f"[Ollama Mock] Response generated using {self.model_name} for prompt ({len(prompt)} chars). Ensure Ollama is running at {self.ollama_url}."
+            logger.error(f"Ollama call failed: {str(e)}")
+            raise RuntimeError("Ollama response generation failed.") from e
+
+        raise RuntimeError("Ollama returned an empty response.")
 
     async def generate_stream(self, prompt: str) -> AsyncGenerator[str, None]:
         payload = {
@@ -88,9 +90,5 @@ class OllamaProvider(BaseLLMProvider):
                                 continue
                         return
         except Exception as e:
-            logger.warning(f"Ollama streaming connection failed ({str(e)}), falling back to mock stream.")
-
-        mock_tokens = f"[Ollama Mock Streaming Response] Answer generated via local Ollama instance ({self.model_name}).".split()
-        for token in mock_tokens:
-            yield token + " "
-            await asyncio.sleep(0.08)
+            logger.error(f"Ollama streaming connection failed: {str(e)}")
+            raise RuntimeError("Ollama streaming failed.") from e

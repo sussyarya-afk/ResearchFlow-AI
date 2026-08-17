@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback } from 'react';
 import { Upload, X, FileText, FolderOpen, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { ACCEPTED_FILE_TYPES, MAX_FILE_SIZE_MB } from '../../../constants';
+import { MAX_FILE_SIZE_MB } from '../../../constants';
 import './UploadModal.css';
 
 interface UploadModalProps {

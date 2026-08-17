@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Outlet, NavLink, Link } from 'react-router-dom';
+import { useAuth } from '@/store';
 import './DashboardLayout.css';
 
 import { LayoutDashboard, FolderKanban, Bot, FileText, Star, Settings } from 'lucide-react';
@@ -40,6 +41,9 @@ const NAV_ITEMS = [
 
 export function DashboardLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const { user } = useAuth();
+  const displayName = user?.fullName || (user?.email ? user.email.split('@')[0] : 'User');
+  const userInitial = displayName.charAt(0).toUpperCase();
 
   return (
     <div className={`rf-dashboard ${sidebarCollapsed ? 'rf-dashboard--collapsed' : ''}`}>
@@ -98,13 +102,13 @@ export function DashboardLayout() {
         </nav>
 
         <div className="rf-sidebar__footer">
-          <div className="rf-sidebar__user">
-            <div className="rf-sidebar__avatar">U</div>
+          <Link to="/profile" className="rf-sidebar__user" style={{ textDecoration: 'none' }}>
+            <div className="rf-sidebar__avatar">{userInitial}</div>
             <div className="rf-sidebar__user-info">
-              <span className="rf-sidebar__user-name">User</span>
-              <span className="rf-sidebar__user-role">Free Plan</span>
+              <span className="rf-sidebar__user-name">{displayName}</span>
+              <span className="rf-sidebar__user-role">{user?.organization || 'Research AI'}</span>
             </div>
-          </div>
+          </Link>
         </div>
       </aside>
 

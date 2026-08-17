@@ -1,37 +1,110 @@
+"""
+ChromaEmbeddingStore — upserts chunk embeddings + metadata into ChromaDB.
+
+This is the WRITE path that matches RetrievalService (the READ path).
+Both must use the same ChromaDB collection name: "document_chunks".
+
+Legacy note:
+  DocumentChunk.embedding (JSON column) is kept for potential future use,
+  but is NOT queried during retrieval. ChromaDB is the authoritative vector
+  store for semantic search.
+"""
 import logging
 from uuid import UUID
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import update
-from app.models.document_chunk import DocumentChunk
 
 logger = logging.getLogger(__name__)
 
-class PostgresEmbeddingStore:
-    """
-    Storage implementation for embeddings using Postgres JSON column.
-    This provides a modular way to swap out embedding storage (e.g., to ChromaDB) later.
-    """
-    def __init__(self, db: AsyncSession):
-        self.db = db
+COLLECTION_NAME = "document_chunks"
 
-    async def save_embeddings(self, chunk_ids: list[UUID], embeddings: list[list[float]]):
-        """Save a list of embeddings corresponding to a list of chunk IDs."""
-        if len(chunk_ids) != len(embeddings):
-            raise ValueError("Mismatched length between chunk_ids and embeddings")
 
-        logger.info(f"Saving {len(chunk_ids)} embeddings to PostgreSQL...")
-        
-        # We can update them sequentially or via a bulk update statement.
-        # Since chunk amounts per document might be small/moderate (10-100), 
-        # a loop or simple execute is acceptable. For larger scale, bulk update mappings are better.
-        for chunk_id, emb in zip(chunk_ids, embeddings):
-            stmt = (
-                update(DocumentChunk)
-                .where(DocumentChunk.id == chunk_id)
-                .values(embedding=emb)
+class ChromaEmbeddingStore:
+    """
+    Upsert embeddings + metadata into ChromaDB so that RetrievalService
+    can find them via .search().
+    """
+
+    def __init__(self) -> None:
+        self._healthy = False
+        self._client = None
+        self._collection = None
+        self._init()
+
+    def _init(self) -> None:
+        try:
+            import chromadb
+            self._client = chromadb.PersistentClient(path="./chroma_db")
+            self._collection = self._client.get_or_create_collection(
+                name=COLLECTION_NAME,
+                metadata={"hnsw:space": "cosine"},
             )
-            await self.db.execute(stmt)
-        
-        await self.db.commit()
-        logger.info(f"Successfully saved {len(chunk_ids)} embeddings.")
+            self._healthy = True
+            logger.info("ChromaEmbeddingStore initialised — collection '%s'.", COLLECTION_NAME)
+        except Exception as exc:
+            self._healthy = False
+            logger.error(
+                "ChromaEmbeddingStore failed to initialise: %s. "
+                "Embeddings will NOT be indexed — retrieval will return empty results.",
+                exc,
+                exc_info=True,
+            )
 
+    def upsert(
+        self,
+        chunk_ids: list[UUID],
+        embeddings: list[list[float]],
+        texts: list[str],
+        metadatas: list[dict],
+    ) -> int:
+        """
+        Upsert embeddings into ChromaDB.  Runs synchronously — wrap with
+        asyncio.to_thread() when calling from async code.
+
+        Args:
+            chunk_ids:   UUIDs of each chunk (used as ChromaDB document IDs).
+            embeddings:  Embedding vectors (one per chunk).
+            texts:       Raw chunk texts (stored as ChromaDB documents).
+            metadatas:   Dicts containing: chunk_id, document_id, project_id,
+                         page_start, page_end, document_name.
+
+        Returns:
+            Number of items upserted, or 0 on failure.
+        """
+        if not self._healthy or self._collection is None:
+            logger.error(
+                "ChromaDB is not healthy — skipping upsert of %d chunks.", len(chunk_ids)
+            )
+            return 0
+
+        if not chunk_ids:
+            return 0
+
+        n = len(chunk_ids)
+        if not (len(embeddings) == len(texts) == len(metadatas) == n):
+            raise ValueError(
+                f"Mismatched lengths: chunk_ids={n} embeddings={len(embeddings)} "
+                f"texts={len(texts)} metadatas={len(metadatas)}"
+            )
+
+        # ChromaDB requires string IDs
+        str_ids = [str(cid) for cid in chunk_ids]
+
+        try:
+            self._collection.upsert(
+                ids=str_ids,
+                embeddings=embeddings,
+                documents=texts,
+                metadatas=metadatas,
+            )
+            logger.info(
+                "ChromaDB upsert complete: %d vectors indexed in collection '%s'.",
+                n,
+                COLLECTION_NAME,
+            )
+            return n
+        except Exception as exc:
+            logger.error("ChromaDB upsert failed: %s", exc, exc_info=True)
+            raise
+
+
+# Singleton — initialised once at import time (same pattern as retrieval_service)
+chroma_embedding_store = ChromaEmbeddingStore()

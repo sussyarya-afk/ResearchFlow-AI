@@ -7,14 +7,17 @@ interface ProjectsListProps {
   projects: Project[];
   isFiltered: boolean;
   onClearFilters: () => void;
+  onProjectUpdated?: () => void;
+  onNewProject?: () => void;
 }
 
-export function ProjectsList({ projects, isFiltered, onClearFilters }: ProjectsListProps) {
+export function ProjectsList({ projects, isFiltered, onClearFilters, onProjectUpdated, onNewProject }: ProjectsListProps) {
   if (projects.length === 0) {
     return (
       <EmptyState
         filtered={isFiltered}
         onClear={onClearFilters}
+        onCreateProject={onNewProject}
       />
     );
   }
@@ -23,7 +26,7 @@ export function ProjectsList({ projects, isFiltered, onClearFilters }: ProjectsL
     <div className="rf-projects-list" role="list">
       {projects.map(project => (
         <div key={project.id} role="listitem">
-          <ProjectCard project={project} />
+          <ProjectCard project={project} onProjectUpdated={onProjectUpdated} />
         </div>
       ))}
     </div>

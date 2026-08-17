@@ -10,6 +10,10 @@ interface RightPanelProps {
   zoomLevel: number;
   onZoomIn: () => void;
   onZoomOut: () => void;
+  currentPage?: number;
+  onPageChange?: (page: number) => void;
+  highlightText?: string;
+  onOpenCitation?: (docId: string, pageNumber: number) => void;
 }
 
 export function RightPanel({
@@ -18,6 +22,10 @@ export function RightPanel({
   zoomLevel,
   onZoomIn,
   onZoomOut,
+  currentPage = 1,
+  onPageChange,
+  highlightText = '',
+  onOpenCitation,
 }: RightPanelProps) {
   return (
     <aside className="rf-ws-right" aria-label="Document viewer and citations">
@@ -28,6 +36,9 @@ export function RightPanel({
           zoomLevel={zoomLevel}
           onZoomIn={onZoomIn}
           onZoomOut={onZoomOut}
+          currentPage={currentPage}
+          onPageChange={onPageChange}
+          highlightText={highlightText}
         />
       </div>
 
@@ -42,11 +53,25 @@ export function RightPanel({
             </h3>
           </div>
           <div className="rf-ws-right__citations-list" role="list" aria-label="Source citations">
-            {citations.map((citation, i) => (
-              <div key={citation.chunk_id} role="listitem">
-                <CitationCard citation={citation} index={i} />
-              </div>
-            ))}
+            {citations.map((citation, i) => {
+              const docId = citation.document_id || citation.documentId || '';
+              const pageNum = citation.page_start ?? citation.pageNumber ?? 1;
+
+              return (
+                <div 
+                  key={citation.chunk_id || `${docId}_${i}`} 
+                  role="listitem"
+                  onClick={() => {
+                    if (onOpenCitation) {
+                      onOpenCitation(docId, pageNum);
+                    }
+                  }}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <CitationCard citation={citation} index={i} />
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

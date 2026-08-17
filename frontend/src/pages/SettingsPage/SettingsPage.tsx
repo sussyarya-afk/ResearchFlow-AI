@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Card, Button, Badge } from '@/components/ui';
+import { Card, Button, Input } from '@/components/ui';
 import { apiClient } from '@/services/api';
-import { Cpu, CheckCircle2, AlertCircle, RefreshCw, Server, Sparkles, ShieldAlert } from 'lucide-react';
+import { Cpu, RefreshCw, Server, Sparkles, Key, CheckCircle2, AlertCircle } from 'lucide-react';
 import './SettingsPage.css';
 
 interface ProviderOption {
@@ -27,26 +27,6 @@ const DEFAULT_PROVIDERS: ProviderOption[] = [
   { id: 'ollama', name: 'Ollama', model: 'llama3', configured: false, status: 'not_configured' },
 ];
 
-const SETTING_SECTIONS = [
-  {
-    title: 'Appearance',
-    description: 'Customize the look and feel of your workspace',
-    items: [
-      { label: 'Theme', value: 'Dark', type: 'select' as const },
-      { label: 'Compact mode', value: false, type: 'toggle' as const },
-    ],
-  },
-  {
-    title: 'Notifications',
-    description: 'Choose what you want to be notified about',
-    items: [
-      { label: 'Email notifications', value: true, type: 'toggle' as const },
-      { label: 'Analysis complete alerts', value: true, type: 'toggle' as const },
-      { label: 'Weekly digest', value: false, type: 'toggle' as const },
-    ],
-  },
-];
-
 export function SettingsPage() {
   const [llmSettings, setLlmSettings] = useState<LLMSettingsState>({
     current_provider: 'gemini',
@@ -56,6 +36,21 @@ export function SettingsPage() {
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [switching, setSwitching] = useState<string | null>(null);
+
+  // Config inputs
+  const [configProvider, setConfigProvider] = useState<string>('gemini');
+  const [configValue, setConfigValue] = useState<string>('');
+  const [configSaving, setConfigSaving] = useState<boolean>(false);
+  const [configSuccess, setConfigSuccess] = useState<string | null>(null);
+  const [configError, setConfigError] = useState<string | null>(null);
+
+  // Preferences
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    return (localStorage.getItem('rf_theme') as 'dark' | 'light') || 'dark';
+  });
+  const [emailNotifs, setEmailNotifs] = useState(true);
+  const [alerts, setAlerts] = useState(true);
+  const [weeklyDigest, setWeeklyDigest] = useState(false);
 
   const fetchLLMSettings = async () => {
     setLoading(true);
@@ -91,7 +86,6 @@ export function SettingsPage() {
       }
     } catch (err) {
       console.error('Failed to switch LLM provider via API:', err);
-      // Fallback state mutation if backend offline
       setLlmSettings((prev) => ({
         ...prev,
         current_provider: providerId,
@@ -102,20 +96,48 @@ export function SettingsPage() {
     }
   };
 
+  const handleSaveConfig = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!configValue.trim()) return;
+
+    setConfigSaving(true);
+    setConfigSuccess(null);
+    setConfigError(null);
+
+    try {
+      await apiClient.updateLLMConfig(configProvider, configValue.trim());
+      setConfigSuccess(`Successfully updated configuration for ${configProvider.toUpperCase()}!`);
+      setConfigValue('');
+      await fetchLLMSettings();
+      setTimeout(() => setConfigSuccess(null), 4000);
+    } catch (err: any) {
+      setConfigError(err?.message || 'Failed to update provider configuration.');
+    } finally {
+      setConfigSaving(false);
+    }
+  };
+
+  const handleToggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('rf_theme', newTheme);
+  };
+
   const renderStatusBadge = (statusStr: string) => {
     switch (statusStr) {
       case 'connected':
         return (
           <span className="rf-status-badge rf-status-badge--connected">
             <span className="rf-status-badge__dot" />
-            Connected
+            Connected & Ready
           </span>
         );
       case 'not_configured':
         return (
           <span className="rf-status-badge rf-status-badge--warning">
             <span className="rf-status-badge__dot" />
-            Not Configured (Mock Fallback)
+            Fallback Mode
           </span>
         );
       case 'error':
@@ -171,7 +193,7 @@ export function SettingsPage() {
               <div>
                 <h2 className="rf-settings-section__title">AI Provider Architecture</h2>
                 <p className="rf-settings-section__desc">
-                  Select which LLM provider handles your RAG pipeline queries
+                  Select which LLM provider handles your RAG pipeline queries (automatic grounded fallback active if credentials missing)
                 </p>
               </div>
               <Button
@@ -241,49 +263,133 @@ export function SettingsPage() {
                 );
               })}
             </div>
+
+            {/* Dynamic API Key & URL Configuration */}
+            <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid var(--color-border)' }}>
+              <h3 style={{ fontSize: 'var(--font-size-sm)', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '4px' }}>
+                Update API Key / Endpoint URL
+              </h3>
+              <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-tertiary)', marginBottom: '16px' }}>
+                Configure your personal credentials dynamically at runtime without restarting the server.
+              </p>
+
+              {configSuccess && (
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', padding: '10px 14px', background: 'rgba(34, 197, 94, 0.1)', border: '1px solid var(--color-success)', borderRadius: 'var(--radius-md)', color: 'var(--color-success)', fontSize: 'var(--font-size-xs)', marginBottom: '16px' }}>
+                  <CheckCircle2 size={16} />
+                  <span>{configSuccess}</span>
+                </div>
+              )}
+
+              {configError && (
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', padding: '10px 14px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid var(--color-error)', borderRadius: 'var(--radius-md)', color: 'var(--color-error)', fontSize: 'var(--font-size-xs)', marginBottom: '16px' }}>
+                  <AlertCircle size={16} />
+                  <span>{configError}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleSaveConfig} style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label htmlFor="config-provider-select" style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Provider</label>
+                  <select
+                    id="config-provider-select"
+                    value={configProvider}
+                    onChange={(e) => setConfigProvider(e.target.value)}
+                    style={{ padding: '8px 12px', background: 'var(--color-bg-input)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', color: 'var(--color-text-primary)', fontSize: 'var(--font-size-sm)', outline: 'none' }}
+                  >
+                    <option value="gemini">Google Gemini API Key</option>
+                    <option value="nvidia">NVIDIA NIM API Key</option>
+                    <option value="ollama">Ollama Server Base URL</option>
+                  </select>
+                </div>
+
+                <div style={{ flex: 1, minWidth: '220px' }}>
+                  <Input
+                    label={configProvider === 'ollama' ? 'Server URL (e.g. http://localhost:11434)' : 'API Key'}
+                    type={configProvider === 'ollama' ? 'text' : 'password'}
+                    placeholder={configProvider === 'ollama' ? 'http://localhost:11434' : 'Paste API Key here...'}
+                    value={configValue}
+                    onChange={(e) => setConfigValue(e.target.value)}
+                    fullWidth
+                    required
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  variant="primary"
+                  disabled={configSaving || !configValue.trim()}
+                  isLoading={configSaving}
+                  leftIcon={<Key size={14} />}
+                >
+                  Save Config
+                </Button>
+              </form>
+            </div>
           </div>
         </Card>
 
-        {/* Existing Sections */}
-        {SETTING_SECTIONS.map((section) => (
-          <Card key={section.title} variant="glass" padding="lg">
-            <div className="rf-settings-section">
-              <div className="rf-settings-section__header">
-                <h2 className="rf-settings-section__title">{section.title}</h2>
-                <p className="rf-settings-section__desc">{section.description}</p>
-              </div>
-
-              {section.items.map((item) => (
-                <div className="rf-settings-item" key={item.label}>
-                  <span className="rf-settings-item__label">{item.label}</span>
-                  {item.type === 'toggle' && (
-                    <button
-                      className={`rf-settings-toggle ${item.value ? 'rf-settings-toggle--on' : ''}`}
-                      aria-label={`Toggle ${item.label}`}
-                    >
-                      <span className="rf-settings-toggle__thumb" />
-                    </button>
-                  )}
-                  {item.type === 'select' && (
-                    <span className="rf-settings-item__value">{String(item.value)}</span>
-                  )}
-                </div>
-              ))}
-            </div>
-          </Card>
-        ))}
-
-        {/* Danger Zone */}
-        <Card variant="outlined" padding="lg">
+        {/* Appearance Settings */}
+        <Card variant="glass" padding="lg">
           <div className="rf-settings-section">
             <div className="rf-settings-section__header">
-              <h2 className="rf-settings-section__title rf-settings-section__title--danger">Danger Zone</h2>
-              <p className="rf-settings-section__desc">Irreversible account actions</p>
+              <h2 className="rf-settings-section__title">Appearance</h2>
+              <p className="rf-settings-section__desc">Customize the look and feel of your workspace</p>
             </div>
-            <div className="rf-settings-section__danger-actions">
-              <Button variant="danger" size="sm">
-                Delete Account
-              </Button>
+
+            <div className="rf-settings-item">
+              <span className="rf-settings-item__label">Theme Mode</span>
+              <button
+                className="rf-settings-toggle rf-settings-toggle--on"
+                onClick={handleToggleTheme}
+                aria-label="Toggle theme"
+              >
+                <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-primary-400)' }}>
+                  {theme === 'dark' ? '🌙 Dark Mode' : '☀️ Light Mode'}
+                </span>
+              </button>
+            </div>
+          </div>
+        </Card>
+
+        {/* Notifications */}
+        <Card variant="glass" padding="lg">
+          <div className="rf-settings-section">
+            <div className="rf-settings-section__header">
+              <h2 className="rf-settings-section__title">Notifications</h2>
+              <p className="rf-settings-section__desc">Choose what you want to be notified about</p>
+            </div>
+
+            <div className="rf-settings-item">
+              <span className="rf-settings-item__label">Email notifications</span>
+              <button
+                className={`rf-settings-toggle ${emailNotifs ? 'rf-settings-toggle--on' : ''}`}
+                onClick={() => setEmailNotifs(!emailNotifs)}
+                aria-label="Toggle Email notifications"
+              >
+                <span className="rf-settings-toggle__thumb" />
+              </button>
+            </div>
+
+            <div className="rf-settings-item">
+              <span className="rf-settings-item__label">Analysis complete alerts</span>
+              <button
+                className={`rf-settings-toggle ${alerts ? 'rf-settings-toggle--on' : ''}`}
+                onClick={() => setAlerts(!alerts)}
+                aria-label="Toggle Analysis complete alerts"
+              >
+                <span className="rf-settings-toggle__thumb" />
+              </button>
+            </div>
+
+            <div className="rf-settings-item">
+              <span className="rf-settings-item__label">Weekly digest</span>
+              <button
+                className={`rf-settings-toggle ${weeklyDigest ? 'rf-settings-toggle--on' : ''}`}
+                onClick={() => setWeeklyDigest(!weeklyDigest)}
+                aria-label="Toggle Weekly digest"
+              >
+                <span className="rf-settings-toggle__thumb" />
+              </button>
             </div>
           </div>
         </Card>

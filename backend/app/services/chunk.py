@@ -11,6 +11,7 @@ Algorithm:
   6. Each chunk records which pages contributed to it.
 """
 
+import asyncio
 import logging
 from typing import List, Optional, Tuple
 from uuid import UUID
@@ -146,10 +147,12 @@ class ChunkService:
         pages_text: List[Tuple[int, str]],
         chunk_size: int = DEFAULT_CHUNK_SIZE,
         overlap: int = DEFAULT_OVERLAP,
-        project_id: Optional[str] = None
+        project_id: Optional[str] = None,
+        document_name: Optional[str] = None,
     ) -> int:
         """
         Create text chunks for a document. Deletes any existing chunks first.
+        Generates embeddings and upserts them into ChromaDB for retrieval.
         Returns the number of chunks created.
         """
         import time
@@ -175,6 +178,9 @@ class ChunkService:
         start_chunking = time.time()
         # Delete any existing chunks (idempotent re-chunking)
         await ChunkRepository.delete_by_document(session, document_id)
+
+        # Also remove stale ChromaDB vectors for this document so we don't keep orphaned data
+        await ChunkService._delete_chroma_vectors_for_document(str(document_id), project_id)
 
         # Run the chunking algorithm
         raw_chunks = chunk_text(pages_text, chunk_size, overlap)
@@ -210,80 +216,180 @@ class ChunkService:
             for c in raw_chunks
         ]
 
-        await ChunkRepository.create_bulk(session, chunk_dtos)
-        logger.info(f"Document {document_id}: created {len(chunk_dtos)} chunks.")
-        
-        # Now, fetch the chunks to get their IDs and texts
-        db_chunks = await ChunkRepository.get_by_document(session, document_id)
-        
+        db_chunks = await ChunkRepository.create_bulk(session, chunk_dtos)
+        logger.info(f"Document {document_id}: created {len(db_chunks)} chunks in PostgreSQL.")
+
         if db_chunks:
-            # Generate embeddings
-            from app.services.embedding import embedding_service
-            from app.repositories.embedding_store import PostgresEmbeddingStore
-            
-            texts = [c.text for c in db_chunks]
-            chunk_ids = [c.id for c in db_chunks]
-            
-            try:
-                if project_id:
-                    await event_bus.publish(
-                        project_id,
-                        create_timeline_event(
-                            event_type=EventType.EMBEDDING_STARTED,
-                            status="running",
-                            metadata={"chunk_count": len(texts)},
-                            project_id=project_id
-                        )
+            await ChunkService._embed_and_index(
+                db_chunks=db_chunks,
+                document_id=document_id,
+                document_name=document_name or str(document_id),
+                project_id=project_id,
+            )
+
+        return len(db_chunks)
+
+    @staticmethod
+    async def _delete_chroma_vectors_for_document(document_id: str, project_id: Optional[str]) -> None:
+        """Remove all ChromaDB vectors for a document (called before re-chunking)."""
+        try:
+            from app.repositories.embedding_store import chroma_embedding_store
+
+            def _delete_sync():
+                if not chroma_embedding_store._healthy or chroma_embedding_store._collection is None:
+                    return
+                # Query by document_id metadata filter to find IDs, then delete
+                try:
+                    results = chroma_embedding_store._collection.get(
+                        where={"document_id": document_id},
+                        include=[],
                     )
-
-                start_embed = time.time()
-                embeddings = embedding_service.generate_embeddings(texts)
-                embed_duration = int((time.time() - start_embed) * 1000)
-
-                if project_id:
-                    await event_bus.publish(
-                        project_id,
-                        create_timeline_event(
-                            event_type=EventType.EMBEDDING_COMPLETED,
-                            status="done",
-                            duration_ms=embed_duration,
-                            metadata={"embedding_count": len(embeddings)},
-                            project_id=project_id
+                    ids_to_delete = results.get("ids", [])
+                    if ids_to_delete:
+                        chroma_embedding_store._collection.delete(ids=ids_to_delete)
+                        logger.info(
+                            "Deleted %d stale ChromaDB vectors for document %s.",
+                            len(ids_to_delete),
+                            document_id,
                         )
+                except Exception as exc:
+                    # Non-fatal — log and continue
+                    logger.warning("Could not delete stale ChromaDB vectors: %s", exc)
+
+            await asyncio.to_thread(_delete_sync)
+        except Exception as exc:
+            logger.warning("ChromaDB cleanup skipped: %s", exc)
+
+    @staticmethod
+    async def _embed_and_index(
+        db_chunks,
+        document_id: UUID,
+        document_name: str,
+        project_id: Optional[str],
+    ) -> None:
+        """
+        Generate embeddings for db_chunks and upsert into ChromaDB.
+        Errors are logged and re-raised so callers can surface them properly.
+        """
+        import time
+        from app.services.embedding import embedding_service
+        from app.repositories.embedding_store import chroma_embedding_store
+        from app.services.event_manager import event_bus, EventType, create_timeline_event
+
+        texts = [c.text for c in db_chunks]
+        chunk_ids = [c.id for c in db_chunks]
+
+        # ── Embedding ──────────────────────────────────────────────────────────
+        if project_id:
+            await event_bus.publish(
+                project_id,
+                create_timeline_event(
+                    event_type=EventType.EMBEDDING_STARTED,
+                    status="running",
+                    metadata={"chunk_count": len(texts)},
+                    project_id=project_id
+                )
+            )
+
+        start_embed = time.time()
+        try:
+            embeddings = await asyncio.to_thread(embedding_service.generate_embeddings, texts)
+        except Exception as exc:
+            err_msg = f"Embedding generation failed for document {document_id}: {exc}"
+            logger.error(err_msg, exc_info=True)
+            if project_id:
+                await event_bus.publish(
+                    project_id,
+                    create_timeline_event(
+                        event_type=EventType.EMBEDDING_STARTED,
+                        status="error",
+                        metadata={"error": str(exc)},
+                        project_id=project_id
                     )
+                )
+            raise RuntimeError(err_msg) from exc
 
-                if project_id:
-                    await event_bus.publish(
-                        project_id,
-                        create_timeline_event(
-                            event_type=EventType.VECTOR_INDEXING_STARTED,
-                            status="running",
-                            metadata={"item_count": len(chunk_ids)},
-                            project_id=project_id
-                        )
+        embed_duration = int((time.time() - start_embed) * 1000)
+
+        if project_id:
+            await event_bus.publish(
+                project_id,
+                create_timeline_event(
+                    event_type=EventType.EMBEDDING_COMPLETED,
+                    status="done",
+                    duration_ms=embed_duration,
+                    metadata={"embedding_count": len(embeddings)},
+                    project_id=project_id
+                )
+            )
+
+        # ── ChromaDB Upsert ────────────────────────────────────────────────────
+        if project_id:
+            await event_bus.publish(
+                project_id,
+                create_timeline_event(
+                    event_type=EventType.VECTOR_INDEXING_STARTED,
+                    status="running",
+                    metadata={"item_count": len(chunk_ids)},
+                    project_id=project_id
+                )
+            )
+
+        # Build metadata dicts required by RetrievalService
+        metadatas = [
+            {
+                "chunk_id": str(chunk_ids[i]),
+                "document_id": str(document_id),
+                "project_id": project_id or "",
+                "page_start": db_chunks[i].page_start,
+                "page_end": db_chunks[i].page_end,
+                "document_name": document_name,
+            }
+            for i in range(len(chunk_ids))
+        ]
+
+        start_index = time.time()
+        try:
+            indexed = await asyncio.to_thread(
+                chroma_embedding_store.upsert,
+                chunk_ids,
+                embeddings,
+                texts,
+                metadatas,
+            )
+        except Exception as exc:
+            err_msg = f"ChromaDB upsert failed for document {document_id}: {exc}"
+            logger.error(err_msg, exc_info=True)
+            if project_id:
+                await event_bus.publish(
+                    project_id,
+                    create_timeline_event(
+                        event_type=EventType.VECTOR_INDEXING_STARTED,
+                        status="error",
+                        metadata={"error": str(exc)},
+                        project_id=project_id
                     )
+                )
+            raise RuntimeError(err_msg) from exc
 
-                start_index = time.time()
-                store = PostgresEmbeddingStore(session)
-                await store.save_embeddings(chunk_ids, embeddings)
-                index_duration = int((time.time() - start_index) * 1000)
+        index_duration = int((time.time() - start_index) * 1000)
 
-                if project_id:
-                    await event_bus.publish(
-                        project_id,
-                        create_timeline_event(
-                            event_type=EventType.VECTOR_INDEXING_COMPLETED,
-                            status="done",
-                            duration_ms=index_duration,
-                            metadata={"indexed_count": len(chunk_ids)},
-                            project_id=project_id
-                        )
-                    )
+        if project_id:
+            await event_bus.publish(
+                project_id,
+                create_timeline_event(
+                    event_type=EventType.VECTOR_INDEXING_COMPLETED,
+                    status="done",
+                    duration_ms=index_duration,
+                    metadata={"indexed_count": indexed},
+                    project_id=project_id
+                )
+            )
 
-            except Exception as e:
-                logger.error(f"Document {document_id}: failed to generate/save embeddings: {e}")
-                
-        return len(chunk_dtos)
+        logger.info(
+            "Document %s: %d vectors upserted into ChromaDB (embed_ms=%d index_ms=%d).",
+            document_id, indexed, embed_duration, index_duration,
+        )
 
     @staticmethod
     async def get_chunks(session: AsyncSession, document_id: UUID) -> List[DocumentChunkResponse]:

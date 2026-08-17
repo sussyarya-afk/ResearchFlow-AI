@@ -1,8 +1,26 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui';
+import { useAuth } from '@/store';
 import './HomePage.css';
 
 export function HomePage() {
+  const navigate = useNavigate();
+  const { demoLogin } = useAuth();
+  const [demoLoading, setDemoLoading] = useState(false);
+
+  const handleDemoLaunch = async () => {
+    setDemoLoading(true);
+    try {
+      await demoLogin();
+      navigate('/dashboard');
+    } catch {
+      navigate('/login');
+    } finally {
+      setDemoLoading(false);
+    }
+  };
+
   return (
     <div className="rf-home">
       {/* ── Nav ─────────────────────────────────────────────── */}
@@ -28,6 +46,9 @@ export function HomePage() {
           <span className="rf-home__brand-text">ResearchFlow AI</span>
         </Link>
         <div className="rf-home__nav-links">
+          <Button variant="ghost" size="sm" onClick={handleDemoLaunch} disabled={demoLoading}>
+            {demoLoading ? 'Loading Demo...' : 'Demo Login'}
+          </Button>
           <Link to="/login">
             <Button variant="ghost" size="sm">Sign In</Button>
           </Link>
@@ -58,9 +79,9 @@ export function HomePage() {
             <Link to="/register">
               <Button size="lg">Start Free Trial</Button>
             </Link>
-            <Link to="/login">
-              <Button variant="secondary" size="lg">View Demo</Button>
-            </Link>
+            <Button variant="secondary" size="lg" onClick={handleDemoLaunch} disabled={demoLoading} id="home-demo-btn">
+              {demoLoading ? 'Starting Workspace...' : '⚡ Launch Interactive Demo'}
+            </Button>
           </div>
         </div>
       </section>

@@ -1,5 +1,5 @@
-from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass
+from sqlalchemy.orm import DeclarativeBase
 
-class Base(MappedAsDataclass, DeclarativeBase, kw_only=True):
+class Base(DeclarativeBase):
     """Base class for all SQLAlchemy 2.0 models."""
     pass

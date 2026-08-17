@@ -1,13 +1,13 @@
-import { FolderKanban } from 'lucide-react';
+import { FolderKanban, Plus } from 'lucide-react';
 import { Button } from '@/components/ui';
 import './EmptyState.css';
 
 interface EmptyStateProps {
   title?: string;
   description?: string;
-  /** Whether the empty state is caused by active filters (no results) vs truly no data */
   filtered?: boolean;
   onClear?: () => void;
+  onCreateProject?: () => void;
 }
 
 export function EmptyState({
@@ -15,6 +15,7 @@ export function EmptyState({
   description,
   filtered = false,
   onClear,
+  onCreateProject,
 }: EmptyStateProps) {
   const defaultTitle = filtered ? 'No matching projects' : 'No projects yet';
   const defaultDesc = filtered
@@ -31,6 +32,11 @@ export function EmptyState({
       {filtered && onClear && (
         <Button variant="ghost" size="sm" onClick={onClear}>
           Clear filters
+        </Button>
+      )}
+      {!filtered && onCreateProject && (
+        <Button variant="primary" size="md" onClick={onCreateProject} leftIcon={<Plus size={16} />}>
+          Create First Project
         </Button>
       )}
     </div>

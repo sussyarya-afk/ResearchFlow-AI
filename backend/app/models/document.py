@@ -7,7 +7,7 @@ from app.models.base import Base
 class Document(Base):
     __tablename__ = "documents"
 
-    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default_factory=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     project_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"))
     name: Mapped[str] = mapped_column(String(255))
     type: Mapped[str] = mapped_column(String(50))
@@ -18,6 +18,6 @@ class Document(Base):
     processed_at: Mapped[datetime] = mapped_column(DateTime, nullable=True, default=None)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
-    project: Mapped["Project"] = relationship("Project", back_populates="documents", default=None)
-    citations: Mapped[list["Citation"]] = relationship("Citation", back_populates="document", cascade="all, delete-orphan", default_factory=list)
-    chunks: Mapped[list["DocumentChunk"]] = relationship("DocumentChunk", back_populates="document", cascade="all, delete-orphan", default_factory=list)
+    project: Mapped["Project"] = relationship("Project", back_populates="documents")
+    citations: Mapped[list["Citation"]] = relationship("Citation", back_populates="document", cascade="all, delete-orphan")
+    chunks: Mapped[list["DocumentChunk"]] = relationship("DocumentChunk", back_populates="document", cascade="all, delete-orphan")

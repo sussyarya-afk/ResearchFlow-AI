@@ -6,6 +6,7 @@ import './ProjectCard.css';
 
 interface ProjectCardProps {
   project: Project;
+  onProjectUpdated?: () => void;
 }
 
 export function ProjectCard({ project }: ProjectCardProps) {

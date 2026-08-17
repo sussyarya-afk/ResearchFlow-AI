@@ -12,7 +12,7 @@ class DocumentChunk(Base):
         Index("ix_document_chunks_doc_idx", "document_id", "chunk_index"),
     )
 
-    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default_factory=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     document_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("documents.id", ondelete="CASCADE"))
     chunk_index: Mapped[int] = mapped_column(Integer, default=0)
     page_start: Mapped[int] = mapped_column(Integer, default=1)
@@ -23,4 +23,4 @@ class DocumentChunk(Base):
     embedding: Mapped[list[float]] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
-    document: Mapped["Document"] = relationship("Document", back_populates="chunks", default=None)
+    document: Mapped["Document"] = relationship("Document", back_populates="chunks")

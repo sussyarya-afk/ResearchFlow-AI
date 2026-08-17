@@ -18,7 +18,7 @@ class GeminiProvider(BaseLLMProvider):
             genai.configure(api_key=self.api_key)
             self.model = genai.GenerativeModel(self._model_name)
         else:
-            logger.warning("GEMINI_API_KEY is not set. Gemini calls will return mock responses.")
+            logger.warning("GEMINI_API_KEY is not set. Gemini is not configured.")
             self.model = None
 
     @property
@@ -52,8 +52,7 @@ class GeminiProvider(BaseLLMProvider):
 
     async def generate(self, prompt: str, timeout: int = 30) -> str:
         if not self.api_key or not self.model:
-            logger.warning("Mocking Gemini LLM response due to missing API key.")
-            return f"[Gemini Mock] Response for prompt ({len(prompt)} chars). Configure GEMINI_API_KEY in backend/.env for real responses."
+            raise RuntimeError("Gemini provider is not configured. Set GEMINI_API_KEY.")
 
         logger.info(f"Generating Gemini response, model: {self.model_name}, prompt len: {len(prompt)}")
         try:
@@ -67,19 +66,14 @@ class GeminiProvider(BaseLLMProvider):
             return result
         except asyncio.TimeoutError:
             logger.error(f"Gemini request timed out after {timeout}s")
-            return "Error: Gemini API request timed out."
+            raise RuntimeError("Gemini API request timed out.")
         except Exception as e:
             logger.error(f"Error in Gemini generate: {str(e)}")
-            return f"Error generating Gemini response: {str(e)}"
+            raise RuntimeError("Gemini response generation failed.") from e
 
     async def generate_stream(self, prompt: str) -> AsyncGenerator[str, None]:
         if not self.api_key or not self.model:
-            logger.warning("Mocking Gemini stream due to missing API key.")
-            mock_tokens = f"[Gemini Mock Streaming Response] Answer generated for your prompt ({len(prompt)} chars).".split()
-            for token in mock_tokens:
-                yield token + " "
-                await asyncio.sleep(0.08)
-            return
+            raise RuntimeError("Gemini provider is not configured. Set GEMINI_API_KEY.")
 
         logger.info(f"Starting Gemini stream, model: {self.model_name}, prompt len: {len(prompt)}")
         try:
@@ -89,4 +83,4 @@ class GeminiProvider(BaseLLMProvider):
                     yield chunk.text
         except Exception as e:
             logger.error(f"Error in Gemini generate_stream: {str(e)}")
-            yield f"\n\n[Gemini Error: {str(e)}]"
+            raise RuntimeError("Gemini streaming failed.") from e

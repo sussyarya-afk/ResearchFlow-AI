@@ -16,6 +16,17 @@ class DocumentRepository:
         return list(result.scalars().all())
 
     @staticmethod
+    async def get_multi_by_user(session: AsyncSession, user_id: UUID) -> List[Document]:
+        from app.models.project import Project
+        result = await session.execute(
+            select(Document)
+            .join(Project, Document.project_id == Project.id)
+            .where(Project.user_id == user_id)
+            .order_by(Document.created_at.desc())
+        )
+        return list(result.scalars().all())
+
+    @staticmethod
     async def get_by_id(session: AsyncSession, document_id: UUID) -> Optional[Document]:
         result = await session.execute(
             select(Document).where(Document.id == document_id)

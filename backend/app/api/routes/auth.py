@@ -53,3 +53,63 @@ async def read_users_me(
     Get current user profile.
     """
     return current_user
+
+
+@router.put("/me", response_model=UserResponse)
+async def update_users_me(
+    user_update: UserCreate,
+    current_user: Annotated[User, Depends(get_current_user)],
+    session: Annotated[AsyncSession, Depends(get_db)],
+):
+    """
+    Update current user profile.
+    """
+    current_user.email = user_update.email
+    if user_update.password:
+        from app.core.security import get_password_hash
+        current_user.hashed_password = get_password_hash(user_update.password)
+    session.add(current_user)
+    await session.commit()
+    await session.refresh(current_user)
+    return current_user
+
+
+@router.post("/demo", response_model=Token)
+async def demo_login(
+    session: Annotated[AsyncSession, Depends(get_db)]
+):
+    """
+    1-Click Demo Login: creates or returns demo account with seeded starter data.
+    """
+    from app.repositories.user import UserRepository
+    from app.schemas.project import ProjectCreate
+    from app.services.project import ProjectService
+    from app.repositories.note import NoteRepository
+
+    demo_email = "demo@researchflow.ai"
+    user = await UserRepository.get_by_email(session, demo_email)
+    
+    if not user:
+        user_in = UserCreate(email=demo_email, password="demo_password_123")
+        user = await AuthService.register_user(session, user_in)
+
+    # Check if user already has projects
+    existing_projects = await ProjectService.get_projects(session, user.id)
+    if not existing_projects:
+        # Seed starter project
+        proj = await ProjectService.create_project(
+            session,
+            ProjectCreate(
+                name="Quantum Computing Optimization",
+                description="Analyzing recent breakthroughs in error correction for superconducting qubits."
+            ),
+            user.id
+        )
+        await NoteRepository.create(
+            session,
+            proj.id,
+            "Initial observation: Surface code error correction threshold achieves < 0.1% physical error rates with topological braid sequencing."
+        )
+
+    access_token = create_access_token(subject=user.email)
+    return {"access_token": access_token, "token_type": "bearer"}

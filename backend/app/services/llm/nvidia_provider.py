@@ -39,8 +39,7 @@ class NvidiaProvider(BaseLLMProvider):
 
     async def generate(self, prompt: str, timeout: int = 30) -> str:
         if not self.api_key:
-            logger.warning("Mocking NVIDIA LLM response due to missing API key.")
-            return f"[NVIDIA Mock] Response for prompt ({len(prompt)} chars). Configure NVIDIA_API_KEY in backend/.env for real responses."
+            raise RuntimeError("NVIDIA provider is not configured. Set NVIDIA_API_KEY.")
 
         headers = {
             "Authorization": f"Bearer {self.api_key}",
@@ -62,16 +61,11 @@ class NvidiaProvider(BaseLLMProvider):
                 return data["choices"][0]["message"]["content"]
         except Exception as e:
             logger.error(f"Error in NVIDIA generate: {str(e)}")
-            return f"Error generating NVIDIA response: {str(e)}"
+            raise RuntimeError("NVIDIA response generation failed.") from e
 
     async def generate_stream(self, prompt: str) -> AsyncGenerator[str, None]:
         if not self.api_key:
-            logger.warning("Mocking NVIDIA stream due to missing API key.")
-            mock_tokens = f"[NVIDIA Mock Streaming Response] Answer generated using {self.model_name}.".split()
-            for token in mock_tokens:
-                yield token + " "
-                await asyncio.sleep(0.08)
-            return
+            raise RuntimeError("NVIDIA provider is not configured. Set NVIDIA_API_KEY.")
 
         headers = {
             "Authorization": f"Bearer {self.api_key}",
@@ -107,4 +101,4 @@ class NvidiaProvider(BaseLLMProvider):
                                 continue
         except Exception as e:
             logger.error(f"Error in NVIDIA generate_stream: {str(e)}")
-            yield f"\n\n[NVIDIA Error: {str(e)}]"
+            raise RuntimeError("NVIDIA streaming failed.") from e

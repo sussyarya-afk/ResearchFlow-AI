@@ -2,6 +2,7 @@ import logging
 from typing import List
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
+from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Annotated
 
@@ -21,6 +22,15 @@ router = APIRouter()
 global_router = APIRouter()
 
 
+@global_router.get("", response_model=List[DocumentResponse])
+async def get_all_user_documents(
+    current_user: Annotated[User, Depends(get_current_user)],
+    session: Annotated[AsyncSession, Depends(get_db)],
+):
+    """Retrieve all documents belonging to the current user across all projects."""
+    return await DocumentService.get_user_documents(session, current_user.id)
+
+
 @global_router.get("/{document_id}/page/{page}")
 async def get_document_page(
     document_id: UUID,
@@ -30,6 +40,36 @@ async def get_document_page(
 ):
     """Retrieve text of a specific page of a document."""
     return await DocumentService.get_document_page(session, document_id, page, current_user.id)
+
+
+@global_router.get("/{document_id}/download")
+async def download_document(
+    document_id: UUID,
+    current_user: Annotated[User, Depends(get_current_user)],
+    session: Annotated[AsyncSession, Depends(get_db)],
+):
+    """Download original PDF document file."""
+    file_path, file_name = await DocumentService.get_document_file(session, document_id, current_user.id)
+    return FileResponse(
+        path=file_path,
+        filename=file_name,
+        media_type="application/pdf",
+    )
+
+
+@global_router.get("/{document_id}/file")
+async def view_document_file(
+    document_id: UUID,
+    current_user: Annotated[User, Depends(get_current_user)],
+    session: Annotated[AsyncSession, Depends(get_db)],
+):
+    """Serve PDF document for inline browser viewing."""
+    file_path, file_name = await DocumentService.get_document_file(session, document_id, current_user.id)
+    return FileResponse(
+        path=file_path,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"inline; filename={file_name}"}
+    )
 
 
 @router.get("/{project_id}/documents", response_model=List[DocumentResponse])
@@ -100,8 +140,10 @@ async def read_document_chunks(
     session: Annotated[AsyncSession, Depends(get_db)],
 ):
     """Retrieve all text chunks for a document, ordered by chunk_index."""
+    # Phase 4: verify project ownership AND that document belongs to this project
     await ProjectService.get_project(session, project_id, current_user.id)
-    return await ChunkService.get_chunks(session, document_id)
+    document = await DocumentService.get_document_by_id_in_project(session, document_id, project_id)
+    return await ChunkService.get_chunks(session, document.id)
 
 
 @router.get(
@@ -115,5 +157,7 @@ async def read_chunk_summary(
     session: Annotated[AsyncSession, Depends(get_db)],
 ):
     """Get chunk summary statistics for a document."""
+    # Phase 4: verify project ownership AND that document belongs to this project
     await ProjectService.get_project(session, project_id, current_user.id)
-    return await ChunkService.get_chunk_summary(session, document_id)
+    document = await DocumentService.get_document_by_id_in_project(session, document_id, project_id)
+    return await ChunkService.get_chunk_summary(session, document.id)

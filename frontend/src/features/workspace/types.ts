@@ -50,6 +50,11 @@ export interface Citation {
   page_end: number;
   excerpt: string;
   similarity: number;
+  // Aliases for convenience
+  documentId?: string;
+  documentName?: string;
+  pageNumber?: number;
+  text?: string;
 }
 
 export interface WorkspaceProject {

@@ -37,6 +37,13 @@ def _safe_filename(filename: str) -> str:
 
 class DocumentService:
     @staticmethod
+    async def get_user_documents(session: AsyncSession, user_id: UUID) -> List[Document]:
+        documents = await DocumentRepository.get_multi_by_user(session, user_id)
+        for doc in documents:
+            doc._chunk_count = await ChunkRepository.count_by_document(session, doc.id)
+        return documents
+
+    @staticmethod
     async def get_documents(session: AsyncSession, project_id: UUID, user_id: UUID) -> List[Document]:
         # Validate project ownership
         await ProjectService.get_project(session, project_id, user_id)
@@ -46,6 +53,34 @@ class DocumentService:
         for doc in documents:
             doc._chunk_count = await ChunkRepository.count_by_document(session, doc.id)
         return documents
+
+    @staticmethod
+    async def get_document_file(session: AsyncSession, document_id: UUID, user_id: UUID) -> Tuple[str, str]:
+        document = await DocumentRepository.get_by_id(session, document_id)
+        if not document:
+            raise HTTPException(status_code=404, detail="Document not found")
+        await ProjectService.get_project(session, document.project_id, user_id)
+        if not document.s3_key or not os.path.exists(document.s3_key):
+            raise HTTPException(status_code=404, detail="Document file not found on disk")
+        return document.s3_key, document.name
+
+    @staticmethod
+    async def get_document_by_id_in_project(
+        session: AsyncSession, document_id: UUID, project_id: UUID
+    ) -> Document:
+        """
+        Fetch a document by ID and verify it belongs to the given project.
+        Raises 404 if not found or 403 if it belongs to a different project.
+        """
+        document = await DocumentRepository.get_by_id(session, document_id)
+        if not document:
+            raise HTTPException(status_code=404, detail="Document not found")
+        if document.project_id != project_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Document does not belong to this project",
+            )
+        return document
 
     @staticmethod
     async def process_pdf(file_path: str) -> dict:
@@ -119,16 +154,19 @@ class DocumentService:
                 ),
             )
 
-        # ── Save file to disk ─────────────────────────────────────────────────
+        # ── Save file to disk (UUID-prefixed to prevent collisions) ───────────
+        import uuid as _uuid
         os.makedirs(UPLOAD_DIR, exist_ok=True)
-        file_path = os.path.join(UPLOAD_DIR, safe_name)
+        # Collision-safe storage name: {uuid}_{sanitized_filename}
+        storage_name = f"{_uuid.uuid4().hex}_{safe_name}"
+        file_path = os.path.join(UPLOAD_DIR, storage_name)
 
         with open(file_path, "wb") as f:
             f.write(content)
 
         logger.info(
-            f"Document uploaded: name={safe_name!r} size_bytes={len(content)} "
-            f"project={proj_id_str} user={user_id}"
+            f"Document uploaded: original={safe_name!r} storage={storage_name!r} "
+            f"size_bytes={len(content)} project={proj_id_str} user={user_id}"
         )
 
         await event_bus.publish(
@@ -141,6 +179,7 @@ class DocumentService:
             ),
         )
 
+        # DB stores original display name; s3_key stores the collision-safe path
         doc_in = DocumentCreate(
             project_id=project_id,
             name=safe_name,
@@ -218,16 +257,26 @@ class DocumentService:
                     db_doc.id,
                     pdf_data["pages_text"],
                     project_id=proj_id_str,
+                    document_name=safe_name,
                 )
                 logger.info(f"Chunking complete: document={db_doc.id} chunks={chunk_count}")
             except Exception as chunk_err:
-                logger.warning(f"Chunking failed for document {db_doc.id}: {chunk_err}")
+                await DocumentRepository.update_status(session, db_doc, "Failed", pages=pdf_data["pages"])
+                logger.error(f"Chunking/indexing failed for document {db_doc.id}: {chunk_err}", exc_info=True)
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Document upload succeeded, but text indexing failed.",
+                ) from chunk_err
 
         except HTTPException:
             raise
         except Exception as exc:
             db_doc = await DocumentRepository.update_status(session, db_doc, "Failed")
             logger.error(f"PDF processing failed for '{safe_name}': {exc}", exc_info=True)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="PDF processing failed.",
+            ) from exc
 
         # Attach chunk count for response
         db_doc._chunk_count = await ChunkRepository.count_by_document(session, db_doc.id)
@@ -240,7 +289,19 @@ class DocumentService:
         if not document or document.project_id != project_id:
             raise HTTPException(status_code=404, detail="Document not found")
 
+        stored_path = document.s3_key
+        await ChunkService._delete_chroma_vectors_for_document(str(document.id), str(project_id))
         await DocumentRepository.delete(session, document)
+        if stored_path and os.path.exists(stored_path):
+            try:
+                os.remove(stored_path)
+                logger.info("Deleted stored PDF file for document %s", document_id)
+            except OSError as exc:
+                logger.error("Failed to delete stored PDF file for document %s: %s", document_id, exc, exc_info=True)
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Document metadata was deleted but the stored file could not be removed.",
+                ) from exc
 
     @staticmethod
     async def get_document_page(session: AsyncSession, document_id: UUID, page: int, user_id: UUID) -> str:

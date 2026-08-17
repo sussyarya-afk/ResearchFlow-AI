@@ -9,10 +9,9 @@ interface ContinueWorkingProps {
     name: string;
     updatedAt: string;
   };
-  progress: number;
 }
 
-export function ContinueWorking({ project, progress }: ContinueWorkingProps) {
+export function ContinueWorking({ project }: ContinueWorkingProps) {
   return (
     <Card className="rf-continue-working" variant="glass" padding="lg">
       <div className="rf-continue-working__content">
@@ -24,15 +23,6 @@ export function ContinueWorking({ project, progress }: ContinueWorkingProps) {
           <span>Last opened {project.updatedAt}</span>
         </div>
         
-        <div className="rf-continue-working__progress">
-          <div className="rf-continue-working__progress-bar">
-            <div 
-              className="rf-continue-working__progress-fill" 
-              style={{ width: `${progress}%` }} 
-            />
-          </div>
-          <span className="rf-continue-working__progress-text">{progress}% Complete</span>
-        </div>
       </div>
       
       <div className="rf-continue-working__action">

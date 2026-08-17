@@ -3,7 +3,6 @@
  */
 
 import type { WorkspaceProject, WorkspaceDocument, ChatMessage, Citation } from '../types';
-import { MOCK_PROJECT, MOCK_DOCUMENTS, MOCK_MESSAGES, MOCK_CITATIONS } from '../mockData';
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
 /** Returns the Bearer token from localStorage, or null if not authenticated. */
@@ -22,23 +21,102 @@ function buildHeaders(extra: Record<string, string> = {}): Record<string, string
 }
 
 export async function fetchWorkspaceProject(projectId: string): Promise<WorkspaceProject> {
-  void projectId;
-  return Promise.resolve({ ...MOCK_PROJECT });
+  const response = await fetch(`${API_BASE}/projects/${projectId}`, {
+    headers: buildHeaders(),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.detail || `Project request failed: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return {
+    id: data.id,
+    name: data.name,
+    description: data.description || '',
+    status: data.status,
+    documentCount: data.document_count ?? 0,
+    chatCount: data.chat_count ?? 0,
+    updatedAt: data.updated_at,
+  };
 }
 
 export async function fetchDocuments(projectId: string): Promise<WorkspaceDocument[]> {
-  void projectId;
-  return Promise.resolve([...MOCK_DOCUMENTS]);
+  const response = await fetch(`${API_BASE}/projects/${projectId}/documents`, {
+    headers: buildHeaders(),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.detail || `Documents request failed: ${response.status}`);
+  }
+
+  const docs = await response.json();
+  return docs.map((doc: any) => {
+    let sizeLabel = '';
+    if (doc.size < 1024) sizeLabel = `${doc.size} B`;
+    else if (doc.size < 1024 * 1024) sizeLabel = `${(doc.size / 1024).toFixed(1)} KB`;
+    else sizeLabel = `${(doc.size / (1024 * 1024)).toFixed(1)} MB`;
+
+    return {
+      id: doc.id,
+      name: doc.name,
+      type: doc.type?.includes('pdf') ? 'pdf' : 'txt',
+      pages: doc.pages,
+      sizeLabel,
+      uploadedAt: doc.created_at,
+      thumbnailColor: '#FF5722',
+      status: doc.processing_status,
+      chunkCount: doc.chunk_count ?? undefined,
+    };
+  });
 }
 
 export async function fetchMessages(projectId: string): Promise<ChatMessage[]> {
-  void projectId;
-  return Promise.resolve([...MOCK_MESSAGES]);
+  const response = await fetch(`${API_BASE}/projects/${projectId}/chat/history`, {
+    headers: buildHeaders(),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.detail || `Chat history request failed: ${response.status}`);
+  }
+
+  const session = await response.json();
+  return (session.messages || []).map((message: any) => ({
+    id: message.id,
+    role: message.role,
+    content: message.content,
+    timestamp: new Date(message.created_at).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+    }),
+    hasTimeline: message.role === 'ai',
+    citations: (message.citations || []).map((citation: any) => ({
+      chunk_id: citation.chunk_id || '',
+      document_id: citation.document_id,
+      document_name: citation.document_name || 'Document',
+      page_start: citation.page_start ?? citation.page_number ?? 1,
+      page_end: citation.page_end ?? citation.page_number ?? 1,
+      excerpt: citation.excerpt,
+      similarity: citation.similarity ?? citation.confidence ?? 0,
+    })),
+  }));
 }
 
 export async function fetchCitations(messageId: string): Promise<Citation[]> {
   void messageId;
-  return Promise.resolve([...MOCK_CITATIONS]);
+  return Promise.resolve([]);
+}
+
+export function buildProjectEventsUrl(projectId: string): string {
+  const token = getAuthToken();
+  const url = new URL(`${API_BASE}/projects/${projectId}/events`);
+  if (token) {
+    url.searchParams.set('token', token);
+  }
+  return url.toString();
 }
 
 export async function sendChatMessage(

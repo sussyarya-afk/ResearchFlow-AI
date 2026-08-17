@@ -8,6 +8,7 @@ import { Button, Input, EmptyState } from '@/components/ui';
 import { SocialLoginButtons } from '@/features/auth/components/SocialLoginButtons';
 import { PasswordStrengthIndicator } from '@/features/auth/components/PasswordStrengthIndicator';
 import { registerSchema, type RegisterFormData } from '@/features/auth/schemas';
+import { apiClient } from '@/services/api';
 
 export function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -30,14 +31,14 @@ export function RegisterPage() {
   const onSubmit = async (data: RegisterFormData) => {
     setApiError(null);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      
-      // Simulate successful registration
-      console.log('Registration data:', data);
+      await apiClient.register({
+        email: data.email,
+        password: data.password,
+      });
+      localStorage.setItem('user_meta', JSON.stringify({ fullName: data.fullName, organization: 'Research Lab' }));
       setIsSuccess(true);
-    } catch (err) {
-      setApiError('An unexpected error occurred. Please try again.');
+    } catch (err: any) {
+      setApiError(err?.message || 'Registration failed. This email may already be in use.');
     }
   };
 

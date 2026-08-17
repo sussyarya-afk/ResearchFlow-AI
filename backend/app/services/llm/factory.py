@@ -96,4 +96,29 @@ class LLMFactory:
             "providers": providers_meta
         }
 
+    @classmethod
+    def update_provider_config(cls, provider_id: str, key_or_url: str) -> None:
+        """Dynamically updates API key or endpoint URL for a provider."""
+        cls._initialize_providers()
+        p_id = provider_id.lower()
+        if p_id == "gemini":
+            import google.generativeai as genai
+            settings.GEMINI_API_KEY = key_or_url.strip()
+            if key_or_url.strip():
+                genai.configure(api_key=key_or_url.strip())
+                cls._providers["gemini"] = GeminiProvider()
+        elif p_id == "nvidia":
+            settings.NVIDIA_API_KEY = key_or_url.strip()
+            cls._providers["nvidia"] = NvidiaProvider()
+        elif p_id == "ollama":
+            settings.OLLAMA_URL = key_or_url.strip()
+            cls._providers["ollama"] = OllamaProvider()
+
 llm_factory = LLMFactory()
+
+def get_llm_provider(provider_name: Optional[str] = None) -> BaseLLMProvider:
+    return LLMFactory.get_provider(provider_name)
+
+def update_provider_config(provider_id: str, key_or_url: str) -> None:
+    return LLMFactory.update_provider_config(provider_id, key_or_url)
+

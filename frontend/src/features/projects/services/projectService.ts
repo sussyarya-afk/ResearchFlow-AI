@@ -8,6 +8,7 @@ export interface ProjectCreate {
 
 export interface ProjectUpdate {
   name?: string;
+  description?: string;
   status?: ProjectStatus;
 }
 
@@ -20,8 +21,8 @@ const mapProject = (data: any): Project => {
     updatedAt: new Date(data.updated_at).toLocaleDateString(),
     updatedAtTimestamp: new Date(data.updated_at).getTime(),
     status: data.status as ProjectStatus,
-    documents: 0, // Fallback as requested
-    chats: 0, // Fallback as requested
+    documents: data.document_count ?? 0,
+    chats: data.chat_count ?? 0,
   };
 };
 

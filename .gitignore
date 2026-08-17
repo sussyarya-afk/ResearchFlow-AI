@@ -25,6 +25,7 @@ dist/
 # App specific
 uploads/
 chroma/
+chroma_db/
 data/
 *.db
 *.sqlite

@@ -24,6 +24,12 @@ export function WorkspacePage() {
     documentsError,
     selectedDocument,
     fetchDocuments,
+    deleteDocument,
+    notes,
+    notesLoading,
+    createNote,
+    updateNote,
+    deleteNote,
     messages,
     inputValue,
     setInputValue,
@@ -39,14 +45,25 @@ export function WorkspacePage() {
     zoomOut,
     activeDocumentId,
     setActiveDocumentId,
+    activePageNumber,
+    setActivePageNumber,
+    highlightText,
     leftTab,
     setLeftTab,
     openDocument,
   } = useWorkspace();
 
-  const handleOpenDocument = (documentId: string, pageNumber: number) => {
+  const handleOpenDocument = (documentId: string, pageNumber: number, excerpt?: string) => {
     setRightPanelVisible(true);
-    openDocument(documentId, pageNumber);
+    openDocument(documentId, pageNumber, excerpt);
+  };
+
+  const handleRunAgentPrompt = (prompt: string) => {
+    setInputValue(prompt);
+    // Focus chat and trigger send on next cycle
+    setTimeout(() => {
+      sendMessage();
+    }, 100);
   };
 
   return (
@@ -60,18 +77,23 @@ export function WorkspacePage() {
           documentsError={documentsError}
           activeDocumentId={activeDocumentId}
           onDocumentSelect={setActiveDocumentId}
+          onDocumentDelete={deleteDocument}
           activeTab={leftTab}
           onTabChange={setLeftTab}
           onUploadClick={() => setUploadOpen(true)}
+          notes={notes}
+          notesLoading={notesLoading}
+          onCreateNote={createNote}
+          onUpdateNote={updateNote}
+          onDeleteNote={deleteNote}
+          citations={citations}
+          onOpenSource={handleOpenDocument}
+          onRunAgentPrompt={handleRunAgentPrompt}
         />
 
         {/* ── Center: Chat ── */}
         <ChatPanel
-          messages={messages.map(msg => ({
-            ...msg,
-            // In a real app we'd pass a single onOpenDocument to the list,
-            // but for simplicity we can just attach it here or let ChatPanel pass it.
-          }))}
+          messages={messages}
           timeline={timeline}
           inputValue={inputValue}
           isGenerating={isGenerating}
@@ -84,13 +106,17 @@ export function WorkspacePage() {
         />
 
         {/* ── Right Panel: Viewer + Citations ── */}
-        {rightPanelVisible && (
+        {rightPanelVisible && selectedDocument && (
           <RightPanel
             document={selectedDocument}
             citations={citations}
             zoomLevel={zoomLevel}
             onZoomIn={zoomIn}
             onZoomOut={zoomOut}
+            currentPage={activePageNumber}
+            onPageChange={setActivePageNumber}
+            highlightText={highlightText}
+            onOpenCitation={handleOpenDocument}
           />
         )}
       </div>

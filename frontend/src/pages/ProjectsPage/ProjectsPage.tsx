@@ -1,8 +1,11 @@
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { ArrowUpDown } from 'lucide-react';
 import { ProjectHeader } from '@/features/projects/components/ProjectHeader';
 import { SearchBar } from '@/features/projects/components/SearchBar';
 import { FilterTabs } from '@/features/projects/components/FilterTabs';
 import { ProjectsList } from '@/features/projects/components/ProjectsList';
+import { CreateProjectModal } from '@/features/projects/components/CreateProjectModal/CreateProjectModal';
 import { useProjects } from '@/features/projects/hooks';
 import { SORT_OPTIONS } from '@/features/projects/constants';
 import { Loader } from '@/components/ui/Loader';
@@ -10,6 +13,9 @@ import { ErrorState } from '@/components/ui/ErrorState';
 import './ProjectsPage.css';
 
 export function ProjectsPage() {
+  const [searchParams] = useSearchParams();
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+
   const {
     projects,
     totalCount,
@@ -25,6 +31,13 @@ export function ProjectsPage() {
     error,
     refreshProjects,
   } = useProjects();
+
+  useEffect(() => {
+    const q = searchParams.get('q');
+    if (q) {
+      setSearchQuery(q);
+    }
+  }, [searchParams, setSearchQuery]);
 
   const isFiltered = searchQuery.trim() !== '' || filter !== 'All';
 
@@ -44,7 +57,7 @@ export function ProjectsPage() {
   return (
     <div className="rf-projects-page animate-fade-in">
       {/* ── Header ── */}
-      <ProjectHeader count={totalCount} />
+      <ProjectHeader count={totalCount} onNewProject={() => setCreateModalOpen(true)} />
 
       {/* ── Toolbar: Search + Tabs + Sort ── */}
       <div className="rf-projects-page__toolbar">
@@ -93,8 +106,20 @@ export function ProjectsPage() {
           projects={projects}
           isFiltered={isFiltered}
           onClearFilters={clearFilters}
+          onProjectUpdated={refreshProjects}
+          onNewProject={() => setCreateModalOpen(true)}
         />
       )}
+
+      {/* ── Create Project Modal ── */}
+      <CreateProjectModal
+        isOpen={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onProjectCreated={() => {
+          setCreateModalOpen(false);
+          refreshProjects();
+        }}
+      />
     </div>
   );
 }

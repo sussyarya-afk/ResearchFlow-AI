@@ -6,6 +6,7 @@ from typing import Dict, Any, List
 from app.services.retrieval import retrieval_service
 from app.services.prompt_builder import prompt_builder
 from app.services.llm.factory import LLMFactory
+from app.services.llm.fallback import synthesize_grounded_answer, synthesize_grounded_stream
 from app.services.event_manager import event_bus, EventType, create_timeline_event
 
 logger = logging.getLogger(__name__)
@@ -15,10 +16,11 @@ class RAGService:
     def __init__(self):
         pass
 
-    async def chat(self, project_id: str, query: str, top_k: int = 5) -> Dict[str, Any]:
+    async def chat(self, project_id: str, query: str, top_k: int = 5, provider=None) -> Dict[str, Any]:
         """
         Executes the RAG pipeline: retrieval → prompt building → LLM generation.
         Strictly interfaces with BaseLLMProvider via LLMFactory.
+        Pass `provider` to use a specific (e.g. per-user) LLM provider.
         """
         query = query.strip()
         if not query:
@@ -37,17 +39,22 @@ class RAGService:
         # 2. Build Prompt
         prompt = prompt_builder.build_prompt(query=query, retrieved_chunks=retrieved_chunks)
 
-        # 3. Generate Answer using active LLM provider
-        provider = LLMFactory.get_provider()
+        # 3. Generate Answer using resolved LLM provider or grounded fallback
+        resolved_provider = provider if provider is not None else LLMFactory.get_provider()
         t2 = time.time()
-        answer = await provider.generate(prompt=prompt)
+        try:
+            answer = await resolved_provider.generate(prompt=prompt)
+        except Exception as exc:
+            logger.warning(f"Provider {resolved_provider.provider_name} generate failed: {exc}. Using grounded fallback.")
+            answer = synthesize_grounded_answer(query, retrieved_chunks)
+            
         llm_ms = int((time.time() - t2) * 1000)
 
         total_ms = int((time.time() - t0) * 1000)
         logger.info(
             f"RAG chat complete | project={project_id} "
             f"chunks={len(retrieved_chunks)} retrieval_ms={retrieval_ms} "
-            f"llm_ms={llm_ms} total_ms={total_ms} provider={provider.provider_name}"
+            f"llm_ms={llm_ms} total_ms={total_ms} provider={resolved_provider.provider_name}"
         )
 
         # 4. Format Sources
@@ -65,9 +72,10 @@ class RAGService:
 
         return {"answer": answer, "sources": sources}
 
-    async def chat_stream(self, project_id: str, query: str, top_k: int = 5):
+    async def chat_stream(self, project_id: str, query: str, top_k: int = 5, provider=None):
         """
         Executes the RAG pipeline and yields stream data: timeline_event, tokens, and sources.
+        Pass `provider` to use a specific (e.g. per-user) LLM provider.
         Handles SSE disconnects via GeneratorExit.
         """
         query = query.strip()
@@ -123,21 +131,27 @@ class RAGService:
             await event_bus.publish(project_id, ev_prompt)
 
             # 3. LLM Started
-            provider = LLMFactory.get_provider()
+            resolved_provider = provider if provider is not None else LLMFactory.get_provider()
             llm_start = time.time()
             ev_llm_start = create_timeline_event(
                 event_type=EventType.LLM_STARTED,
                 status="running",
-                metadata={"model": provider.model_name, "provider": provider.provider_name},
+                metadata={"model": resolved_provider.model_name, "provider": resolved_provider.provider_name},
                 project_id=project_id,
             )
             yield {"type": "timeline_event", "event": ev_llm_start}
             await event_bus.publish(project_id, ev_llm_start)
 
             token_count = 0
-            async for chunk in provider.generate_stream(prompt=prompt):
-                token_count += 1
-                yield {"type": "token", "content": chunk}
+            try:
+                async for chunk in resolved_provider.generate_stream(prompt=prompt):
+                    token_count += 1
+                    yield {"type": "token", "content": chunk}
+            except Exception as stream_err:
+                logger.warning(f"Provider {resolved_provider.provider_name} stream error: {stream_err}. Using grounded fallback stream.")
+                async for chunk in synthesize_grounded_stream(query, retrieved_chunks):
+                    token_count += 1
+                    yield {"type": "token", "content": chunk}
 
             llm_duration = int((time.time() - llm_start) * 1000)
 
@@ -146,7 +160,7 @@ class RAGService:
                 event_type=EventType.LLM_COMPLETED,
                 status="done",
                 duration_ms=llm_duration,
-                metadata={"tokens_generated": token_count, "provider": provider.provider_name},
+                metadata={"tokens_generated": token_count, "provider": resolved_provider.provider_name},
                 project_id=project_id,
             )
             yield {"type": "timeline_event", "event": ev_llm_comp}
@@ -183,7 +197,7 @@ class RAGService:
                 f"RAG stream complete | project={project_id} "
                 f"retrieval_ms={retrieval_duration} llm_ms={llm_duration} "
                 f"total_ms={total_duration} tokens={token_count} "
-                f"provider={provider.provider_name}"
+                f"provider={resolved_provider.provider_name}"
             )
 
         except GeneratorExit:
@@ -192,7 +206,7 @@ class RAGService:
             logger.info(f"RAG stream cancelled | project={project_id}")
         except Exception as exc:
             logger.error(f"RAG stream error | project={project_id}: {exc}", exc_info=True)
-            yield {"type": "error", "content": f"An error occurred during streaming: {exc}"}
+            yield {"type": "error", "content": "An error occurred during streaming."}
 
 
 rag_service = RAGService()
