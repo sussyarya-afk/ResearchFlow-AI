@@ -6,14 +6,9 @@ export type { Project, ProjectStatus, ProjectFilterOption, ProjectSortOption } f
 // Constants
 export { FILTER_OPTIONS, SORT_OPTIONS } from './constants';
 
-// Mock data
-export { MOCK_PROJECTS } from './mockData';
-
 // Hooks
 export { useProjects } from './hooks';
 
-// Services
-export { fetchProjects, fetchProjectById } from './services';
 
 // Components
 export { ProjectHeader } from './components/ProjectHeader';

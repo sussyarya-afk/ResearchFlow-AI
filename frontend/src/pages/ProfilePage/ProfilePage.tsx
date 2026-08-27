@@ -16,9 +16,9 @@ export function ProfilePage() {
 
   useEffect(() => {
     if (user) {
-      setFullName(user.fullName || (user.email === 'demo@researchflow.ai' ? 'Alex Rivera' : ''));
+      setFullName(user.fullName || (user.email?.includes('demo') ? 'Alex Rivera' : ''));
       setEmail(user.email);
-      setOrganization(user.organization || 'Research Labs AI');
+      setOrganization(user.organization || 'AgentNotebook Research Labs');
     }
   }, [user]);
 

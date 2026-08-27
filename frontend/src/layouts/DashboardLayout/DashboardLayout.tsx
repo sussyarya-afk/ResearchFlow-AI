@@ -54,21 +54,29 @@ export function DashboardLayout() {
             <div className="rf-sidebar__logo-mark">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                 <path
-                  d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+                  d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"
                   stroke="url(#sidebar-grad)"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
+                <path
+                  d="M9 7h6M9 11h6M9 15h4"
+                  stroke="url(#sidebar-grad)"
+                  strokeWidth="1.75"
+                  strokeLinecap="round"
+                />
+                <circle cx="17" cy="15" r="1.5" fill="#38bdf8" />
                 <defs>
-                  <linearGradient id="sidebar-grad" x1="2" y1="2" x2="22" y2="22">
-                    <stop stopColor="var(--color-primary-400)" />
-                    <stop offset="1" stopColor="var(--color-accent-400)" />
+                  <linearGradient id="sidebar-grad" x1="4" y1="2" x2="20" y2="22">
+                    <stop stopColor="#38bdf8" />
+                    <stop offset="0.5" stopColor="#818cf8" />
+                    <stop offset="1" stopColor="#c084fc" />
                   </linearGradient>
                 </defs>
               </svg>
             </div>
-            <span className="rf-sidebar__logo-text">ResearchFlow</span>
+            <span className="rf-sidebar__logo-text">AgentNotebook</span>
           </Link>
 
           <button

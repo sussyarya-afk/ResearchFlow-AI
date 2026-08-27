@@ -63,7 +63,7 @@ export function ChatPanel({
           <Bot size={16} />
         </div>
         <h2 className="rf-chat-panel__title">Research Chat</h2>
-        <span className="rf-chat-panel__model">ResearchFlow AI</span>
+        <span className="rf-chat-panel__model">AgentNotebook AI</span>
       </div>
 
       {/* ── Messages ── */}

@@ -37,7 +37,7 @@ export function MessageBubble({ message, timeline, isLatestAI, onOpenDocument }:
 
       <div className="rf-msg__body">
         <div className="rf-msg__header">
-          <span className="rf-msg__sender">{isUser ? 'You' : 'ResearchFlow AI'}</span>
+          <span className="rf-msg__sender">{isUser ? 'You' : 'AgentNotebook AI'}</span>
           <time className="rf-msg__time" dateTime={message.timestamp}>{message.timestamp}</time>
         </div>
 

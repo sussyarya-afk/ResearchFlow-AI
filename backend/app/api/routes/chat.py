@@ -23,7 +23,7 @@ from app.services.rag import rag_service
 from app.services.project import ProjectService
 from app.services.llm.factory import LLMFactory
 from app.repositories.chat import ChatSessionRepository, MessageRepository, CitationRepository
-from app.schemas.chat import ChatSessionResponse
+from app.schemas.chat import ChatSessionResponse, CitationResponse
 
 logger = logging.getLogger(__name__)
 
@@ -34,19 +34,9 @@ class ChatRequest(BaseModel):
     query: str
 
 
-class CitationOut(BaseModel):
-    document_id: str
-    document_name: str
-    chunk_id: str
-    page_start: int
-    page_end: int
-    excerpt: str
-    similarity: float
-
-
 class ChatResponse(BaseModel):
     answer: str
-    sources: List[CitationOut]
+    sources: List[CitationResponse]
 
 
 # ── Helper: resolve per-user LLM provider ───────────────────────────────────

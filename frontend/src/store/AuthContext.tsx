@@ -39,8 +39,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const profile: UserProfile = {
           id: data.id,
           email: data.email,
-          fullName: meta.fullName || (data.email === 'demo@researchflow.ai' ? 'Alex Rivera' : data.email.split('@')[0]),
-          organization: meta.organization || 'Research Labs AI',
+          fullName: meta.fullName || (data.email?.includes('demo') ? 'Alex Rivera' : data.email.split('@')[0]),
+          organization: meta.organization || 'AgentNotebook Research Labs',
           llmProvider: data.llm_provider || 'gemini',
         };
         setUser(profile);
@@ -76,9 +76,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setToken(res.access_token);
         const profile: UserProfile = {
           id: 'demo_user',
-          email: 'demo@researchflow.ai',
+          email: 'demo@agentnotebook.ai',
           fullName: 'Alex Rivera',
-          organization: 'Cognitive Computing Institute',
+          organization: 'AgentNotebook Research Labs',
           llmProvider: 'gemini',
         };
         setUser(profile);

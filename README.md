@@ -1,6 +1,9 @@
-# ResearchFlow AI
+# AgentNotebook AI
 
-ResearchFlow AI is a FastAPI + React/Vite research workspace for uploading PDFs, indexing their text into ChromaDB, and asking document-grounded questions through Gemini, NVIDIA, or Ollama.
+> **Research. Think. Connect.**  
+> *An intelligent research notebook that turns your documents, questions, and sources into connected knowledge.*
+
+AgentNotebook AI is a high-performance research operating system built with FastAPI, React 19, TypeScript, and ChromaDB. It indexes scientific PDFs, creates dense semantic vector graphs, and synthesizes answers grounded in verifiable document page citations through modular LLM providers (NVIDIA NIM, Google Gemini, Ollama).
 
 ## Architecture
 

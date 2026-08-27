@@ -24,8 +24,11 @@ dist/
 
 # App specific
 uploads/
+backend/uploads/
 chroma/
 chroma_db/
+backend/chroma_db/
 data/
 *.db
 *.sqlite
+*.sqlite3

@@ -1,5 +1,5 @@
 """
-Grounded Fallback Synthesizer for ResearchFlow AI.
+Grounded Fallback Synthesizer for AgentNotebook AI.
 Generates structured, cited responses directly from retrieved document chunks
 when external LLM APIs are not configured or unreachable.
 """

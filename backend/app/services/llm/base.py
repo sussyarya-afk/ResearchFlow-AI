@@ -3,7 +3,7 @@ from typing import AsyncGenerator, Dict, Any
 
 class BaseLLMProvider(ABC):
     """
-    Abstract Base Class for all LLM Providers in ResearchFlow AI.
+    Abstract Base Class for all LLM Providers in AgentNotebook AI.
     Every LLM provider must implement generate and generate_stream.
     """
 

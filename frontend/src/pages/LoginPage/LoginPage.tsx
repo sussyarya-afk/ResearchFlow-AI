@@ -6,7 +6,7 @@ import { useAuth } from '@/store';
 import { Sparkles, AlertCircle } from 'lucide-react';
 
 export function LoginPage() {
-  const [email, setEmail] = useState('demo@researchflow.ai');
+  const [email, setEmail] = useState('demo@agentnotebook.ai');
   const [password, setPassword] = useState('demo_password_123');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -54,7 +54,7 @@ export function LoginPage() {
     <div className="rf-auth-form animate-fade-in-up">
       <h2 className="rf-auth-form__title">Welcome back</h2>
       <p className="rf-auth-form__subtitle">
-        Sign in to continue to ResearchFlow AI
+        Sign in to continue to AgentNotebook AI
       </p>
 
       {/* ── 1-Click Demo Access ── */}

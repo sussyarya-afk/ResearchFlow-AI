@@ -1,0 +1,205 @@
+/* ── Active Theory Style 3D Knowledge Galaxy CSS ───────────── */
+
+.an-galaxy-sec {
+  position: relative;
+  padding: 100px 24px;
+  background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(56, 189, 248, 0.04) 0%, transparent 70%);
+}
+
+.an-galaxy__container {
+  max-width: var(--max-content-width);
+  margin: 0 auto;
+}
+
+.an-galaxy__header {
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.an-galaxy__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  border-radius: var(--radius-full);
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  color: var(--color-primary-300);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.an-galaxy__title {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--color-text-primary);
+  margin-bottom: 20px;
+}
+
+.an-galaxy__desc {
+  font-size: var(--font-size-lg);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+/* Box */
+.an-galaxy__box {
+  padding: 28px;
+  border-radius: var(--radius-2xl);
+  background: rgba(8, 12, 22, 0.85);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-xl);
+}
+
+.an-galaxy__top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.an-galaxy__status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-success);
+  letter-spacing: 0.06em;
+}
+
+.an-galaxy__hint {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-primary-400);
+  letter-spacing: 0.08em;
+}
+
+.an-galaxy__grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 32px;
+  align-items: center;
+}
+
+.an-galaxy__canvas-col {
+  width: 100%;
+  height: 460px;
+  border-radius: var(--radius-xl);
+  background: rgba(3, 4, 8, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  cursor: grab;
+}
+
+.an-galaxy__canvas-col:active {
+  cursor: grabbing;
+}
+
+.an-galaxy__canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.an-galaxy__clusters-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.an-galaxy__col-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-text-tertiary);
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+
+.an-galaxy__clusters-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.an-cluster-item {
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  background: rgba(15, 20, 36, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.an-cluster-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(56, 189, 248, 0.3);
+  transform: translateX(4px);
+}
+
+.an-cluster-item--active {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.45);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.an-cluster-item__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.an-cluster-item__name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.an-cluster-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.an-cluster-item__name {
+  font-family: var(--font-display);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.an-cluster-item__count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-text-tertiary);
+}
+
+.an-cluster-item__desc {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 900px) {
+  .an-galaxy__grid {
+    grid-template-columns: 1fr;
+  }
+}

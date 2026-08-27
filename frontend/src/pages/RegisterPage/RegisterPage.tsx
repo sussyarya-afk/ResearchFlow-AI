@@ -59,7 +59,7 @@ export function RegisterPage() {
         <EmptyState
           icon={<CheckCircle2 size={48} color="var(--color-success)" />}
           title="Account Created"
-          description="Your ResearchFlow AI account has been successfully created. We've sent a verification email to your inbox."
+          description="Your AgentNotebook AI account has been successfully created. We've sent a verification email to your inbox."
           action={
             <Link to="/login">
               <Button variant="primary">Proceed to Sign In</Button>

@@ -1,0 +1,216 @@
+/* ── Technical Architecture Section CSS ─────────────────────── */
+.an-arch-sec {
+  position: relative;
+  padding: 100px 24px;
+  background: radial-gradient(ellipse 70% 50% at 50% 40%, rgba(56, 189, 248, 0.04) 0%, transparent 70%);
+}
+
+.an-arch__container {
+  max-width: var(--max-content-width);
+  margin: 0 auto;
+}
+
+.an-arch__header {
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.an-arch__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  border-radius: var(--radius-full);
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  color: var(--color-primary-300);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.an-arch__title {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--color-text-primary);
+  margin-bottom: 20px;
+}
+
+.an-arch__desc {
+  font-size: var(--font-size-lg);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+/* Flow Card */
+.an-arch__flow-card {
+  padding: 32px;
+  border-radius: var(--radius-2xl);
+  background: rgba(10, 14, 24, 0.85);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-xl);
+  margin-bottom: 48px;
+}
+
+.an-arch__flow-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--color-border-subtle);
+  margin-bottom: 24px;
+}
+
+.an-arch__flow-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: #38bdf8;
+  letter-spacing: 0.06em;
+}
+
+.an-arch__flow-sub {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+}
+
+.an-arch__pipeline-track {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.an-arch-node {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 140px;
+}
+
+.an-arch-node__box {
+  flex: 1;
+  padding: 14px 12px;
+  border-radius: var(--radius-lg);
+  background: rgba(15, 20, 34, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all var(--transition-fast);
+}
+
+.an-arch-node__box:hover {
+  background: rgba(56, 189, 248, 0.08);
+  border-color: rgba(56, 189, 248, 0.35);
+  transform: translateY(-2px);
+}
+
+.an-arch-node__icon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #38bdf8;
+  flex-shrink: 0;
+}
+
+.an-arch-node__info {
+  display: flex;
+  flex-direction: column;
+}
+
+.an-arch-node__name {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+
+.an-arch-node__tag {
+  font-size: 10px;
+  color: var(--color-text-tertiary);
+}
+
+.an-arch-node__arrow {
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(-90deg);
+}
+
+/* Tech Badges Grid */
+.an-arch__tech-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.an-tech-pill {
+  padding: 14px 18px;
+  border-radius: var(--radius-xl);
+  background: rgba(15, 20, 34, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all var(--transition-fast);
+}
+
+.an-tech-pill:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.an-tech-pill__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.an-tech-pill__content {
+  display: flex;
+  flex-direction: column;
+}
+
+.an-tech-pill__name {
+  font-family: var(--font-display);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.an-tech-pill__role {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+}
+
+@media (max-width: 1100px) {
+  .an-arch__pipeline-track {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .an-arch-node {
+    flex-direction: column;
+  }
+  .an-arch-node__arrow {
+    transform: rotate(0deg);
+    margin: 4px 0;
+  }
+}

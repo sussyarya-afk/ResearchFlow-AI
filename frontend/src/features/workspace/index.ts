@@ -27,14 +27,6 @@ export {
   MAX_FILE_SIZE_MB,
 } from './constants';
 
-// Mock data
-export {
-  MOCK_PROJECT,
-  MOCK_DOCUMENTS,
-  MOCK_MESSAGES,
-  MOCK_CITATIONS,
-} from './mockData';
-
 // Hooks
 export { useWorkspace } from './hooks';
 

@@ -86,8 +86,11 @@ async def demo_login(
     from app.services.project import ProjectService
     from app.repositories.note import NoteRepository
 
-    demo_email = "demo@researchflow.ai"
+    demo_email = "demo@agentnotebook.ai"
     user = await UserRepository.get_by_email(session, demo_email)
+    if not user:
+        # Check historical demo email if existing
+        user = await UserRepository.get_by_email(session, "demo@researchflow.ai")
     
     if not user:
         user_in = UserCreate(email=demo_email, password="demo_password_123")

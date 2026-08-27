@@ -1,88 +1,116 @@
 /* ============================================================
-   ResearchFlow AI — Global Design Tokens & Theme
+   AgentNotebook AI — Global Design System & Theme Tokens
+   "Research. Think. Connect."
    ============================================================ */
 
 :root {
-  /* ── Colour Palette ─────────────────────────────────────── */
-  --color-bg-primary: #0a0e1a;
-  --color-bg-secondary: #0f1428;
-  --color-bg-tertiary: #141a32;
-  --color-bg-elevated: #1a2140;
-  --color-bg-surface: rgba(20, 26, 50, 0.6);
+  /* ── Background & Surface Palette (Cinematic Dark) ──────── */
+  --color-bg-void: #030408;
+  --color-bg-primary: #06080f;
+  --color-bg-secondary: #0a0e18;
+  --color-bg-tertiary: #0f1422;
+  --color-bg-elevated: #151c2e;
+  --color-bg-surface: rgba(15, 20, 34, 0.72);
+  --color-bg-input: rgba(10, 14, 24, 0.85);
 
-  /* Blue primary scale */
-  --color-primary-50: #e8f0fe;
-  --color-primary-100: #c5d9fc;
-  --color-primary-200: #9ebffa;
-  --color-primary-300: #74a4f7;
-  --color-primary-400: #528ff5;
-  --color-primary-500: #3b7bf4;
-  --color-primary-600: #2e6be8;
-  --color-primary-700: #1e57d0;
-  --color-primary-800: #1446b8;
-  --color-primary-900: #0a2f8a;
+  /* Primary Blue/Cyan Scale (Research & Clarity) */
+  --color-primary-50: #f0f9ff;
+  --color-primary-100: #e0f2fe;
+  --color-primary-200: #bae6fd;
+  --color-primary-300: #7dd3fc;
+  --color-primary-400: #38bdf8;
+  --color-primary-500: #0ea5e9;
+  --color-primary-600: #0284c7;
+  --color-primary-700: #0369a1;
+  --color-primary-800: #075985;
+  --color-primary-900: #0c4a6e;
 
-  /* Purple accent scale */
-  --color-accent-50: #f3e8ff;
-  --color-accent-100: #e0c8ff;
-  --color-accent-200: #c9a3ff;
-  --color-accent-300: #b27dff;
-  --color-accent-400: #9f5fff;
-  --color-accent-500: #8b47f6;
-  --color-accent-600: #7b3ce8;
-  --color-accent-700: #6729d4;
-  --color-accent-800: #5420b8;
-  --color-accent-900: #3b1290;
+  /* Accent Indigo/Violet Scale (Intelligence & Synthesis) */
+  --color-accent-50: #eef2ff;
+  --color-accent-100: #e0e7ff;
+  --color-accent-200: #c7d2fe;
+  --color-accent-300: #a5b4fc;
+  --color-accent-400: #818cf8;
+  --color-accent-500: #6366f1;
+  --color-accent-600: #4f46e5;
+  --color-accent-700: #4338ca;
+  --color-accent-800: #3730a3;
+  --color-accent-900: #312e81;
 
-  /* Semantic colours */
-  --color-success: #22c55e;
+  /* Ethereal Glow Highlights */
+  --color-luminous-cyan: #38bdf8;
+  --color-luminous-violet: #818cf8;
+  --color-luminous-purple: #c084fc;
+  --color-luminous-emerald: #34d399;
+  --color-luminous-amber: #fbbf24;
+
+  /* Semantic Status Colors */
+  --color-success: #10b981;
   --color-warning: #f59e0b;
-  --color-error: #ef4444;
-  --color-info: #3b82f6;
+  --color-error: #f43f5e;
+  --color-info: #38bdf8;
 
-  /* Text */
-  --color-text-primary: #f1f5f9;
+  /* Text Hierarchy */
+  --color-text-primary: #f8fafc;
   --color-text-secondary: #94a3b8;
   --color-text-tertiary: #64748b;
   --color-text-muted: #475569;
-  --color-text-inverse: #0a0e1a;
+  --color-text-inverse: #030408;
 
-  /* Borders */
-  --color-border-default: rgba(148, 163, 184, 0.12);
-  --color-border-hover: rgba(148, 163, 184, 0.24);
-  --color-border-active: var(--color-primary-500);
+  /* Borders & Dividers */
+  --color-border-subtle: rgba(255, 255, 255, 0.05);
+  --color-border-default: rgba(255, 255, 255, 0.09);
+  --color-border-hover: rgba(255, 255, 255, 0.18);
+  --color-border-active: rgba(56, 189, 248, 0.5);
+  --color-border: var(--color-border-default);
 
-  /* ── Glassmorphism ──────────────────────────────────────── */
-  --glass-bg: rgba(15, 20, 40, 0.65);
-  --glass-bg-light: rgba(20, 26, 50, 0.45);
-  --glass-border: rgba(148, 163, 184, 0.1);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
-  --glass-blur: blur(16px);
+  /* ── Cinematic Glass & Depth ────────────────────────────── */
+  --glass-bg: rgba(10, 14, 24, 0.7);
+  --glass-bg-subtle: rgba(15, 20, 34, 0.45);
+  --glass-bg-elevated: rgba(21, 28, 46, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border-highlight: rgba(56, 189, 248, 0.2);
+  --glass-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.6);
+  --glass-blur: blur(20px);
 
-  /* ── Typography ─────────────────────────────────────────── */
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  --font-size-xs: 0.75rem;
-  --font-size-sm: 0.8125rem;
-  --font-size-base: 0.875rem;
-  --font-size-md: 1rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.5rem;
-  --font-size-3xl: 1.875rem;
-  --font-size-4xl: 2.25rem;
-  --font-size-5xl: 3rem;
+  /* ── Typography Scales ──────────────────────────────────── */
+  --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Space Grotesk', var(--font-family);
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --font-size-2xs: 0.6875rem; /* 11px */
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.8125rem;  /* 13px */
+  --font-size-base: 0.875rem; /* 14px */
+  --font-size-md: 1rem;       /* 16px */
+  --font-size-lg: 1.125rem;   /* 18px */
+  --font-size-xl: 1.25rem;    /* 20px */
+  --font-size-2xl: 1.5rem;    /* 24px */
+  --font-size-3xl: 1.875rem;  /* 30px */
+  --font-size-4xl: 2.25rem;   /* 36px */
+  --font-size-5xl: 3rem;      /* 48px */
+  --font-size-6xl: 3.75rem;   /* 60px */
+  --font-size-7xl: 4.5rem;    /* 72px */
+  --font-size-hero: clamp(2.75rem, 7vw, 6.5rem);
+
   --font-weight-light: 300;
   --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
   --font-weight-extrabold: 800;
-  --line-height-tight: 1.2;
-  --line-height-normal: 1.5;
-  --line-height-relaxed: 1.75;
 
-  /* ── Spacing ────────────────────────────────────────────── */
+  --line-height-tight: 1.1;
+  --line-height-snug: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.7;
+
+  --letter-spacing-tight: -0.03em;
+  --letter-spacing-normal: -0.01em;
+  --letter-spacing-wide: 0.05em;
+  --letter-spacing-caps: 0.12em;
+
+  /* ── Spacing System ─────────────────────────────────────── */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -95,40 +123,72 @@
   --space-16: 4rem;
   --space-20: 5rem;
   --space-24: 6rem;
+  --space-32: 8rem;
 
-  /* ── Border Radius ──────────────────────────────────────── */
+  /* ── Radii ──────────────────────────────────────────────── */
+  --radius-xs: 0.25rem;
   --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  --radius-2xl: 1.25rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 0.875rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.75rem;
   --radius-full: 9999px;
 
-  /* ── Shadows ────────────────────────────────────────────── */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.25);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.35);
-  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.4);
-  --shadow-glow-primary: 0 0 20px rgba(59, 123, 244, 0.25);
-  --shadow-glow-accent: 0 0 20px rgba(139, 71, 246, 0.25);
+  /* ── Shadows & Atmospheric Glow ─────────────────────────── */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 24px 60px rgba(0, 0, 0, 0.75);
+  
+  --shadow-glow-cyan: 0 0 30px rgba(56, 189, 248, 0.2);
+  --shadow-glow-violet: 0 0 30px rgba(129, 140, 248, 0.2);
+  --shadow-glow-subtle: 0 0 40px rgba(56, 189, 248, 0.08);
 
-  /* ── Transitions ────────────────────────────────────────── */
-  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* ── Transitions & Kinetic Curves ───────────────────────── */
+  --transition-fast: 140ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --transition-base: 240ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-slow: 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-spring: 600ms cubic-bezier(0.34, 1.4, 0.64, 1);
 
-  /* ── Z-index ────────────────────────────────────────────── */
-  --z-dropdown: 100;
-  --z-sticky: 200;
-  --z-overlay: 300;
+  /* ── Z-Index Layers ─────────────────────────────────────── */
+  --z-base: 1;
+  --z-dock: 10;
+  --z-sticky: 100;
+  --z-header: 200;
+  --z-dropdown: 300;
   --z-modal: 400;
   --z-toast: 500;
 
-  /* ── Layout ─────────────────────────────────────────────── */
-  --sidebar-width: 260px;
+  /* ── Layout Dimensions ──────────────────────────────────── */
+  --sidebar-width: 270px;
   --sidebar-collapsed-width: 72px;
   --header-height: 64px;
-  --max-content-width: 1280px;
+  --max-content-width: 1320px;
+}
+
+/* Light Theme Variable Overrides (if toggled) */
+[data-theme='light'] {
+  --color-bg-void: #f1f5f9;
+  --color-bg-primary: #f8fafc;
+  --color-bg-secondary: #ffffff;
+  --color-bg-tertiary: #f1f5f9;
+  --color-bg-elevated: #ffffff;
+  --color-bg-surface: rgba(255, 255, 255, 0.85);
+  --color-bg-input: rgba(255, 255, 255, 0.95);
+
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-tertiary: #64748b;
+  --color-text-muted: #94a3b8;
+  --color-text-inverse: #ffffff;
+
+  --color-border-subtle: rgba(0, 0, 0, 0.04);
+  --color-border-default: rgba(0, 0, 0, 0.08);
+  --color-border-hover: rgba(0, 0, 0, 0.16);
+
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-bg-subtle: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
 }

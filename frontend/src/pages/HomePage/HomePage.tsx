@@ -1,7 +1,24 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/store';
+import { CustomCursor } from '@/components/CustomCursor/CustomCursor';
+import { ActiveTheoryHUD } from '@/components/ActiveTheoryHUD/ActiveTheoryHUD';
+import {
+  Navbar,
+  HeroSection,
+  ProblemSection,
+  RagPipelineSection,
+  AgentTimelineSection,
+  ExperimentsReel,
+  KnowledgeGalaxySection,
+  DocumentExperienceSection,
+  ChatDemoSection,
+  CitationsSection,
+  WorkspacePreviewSection,
+  ProvidersSection,
+  ArchitectureSection,
+  FinalCtaSection,
+} from './components';
 import './HomePage.css';
 
 export function HomePage() {
@@ -14,7 +31,8 @@ export function HomePage() {
     try {
       await demoLogin();
       navigate('/dashboard');
-    } catch {
+    } catch (err) {
+      console.warn('Demo login redirected to login fallback', err);
       navigate('/login');
     } finally {
       setDemoLoading(false);
@@ -22,101 +40,54 @@ export function HomePage() {
   };
 
   return (
-    <div className="rf-home">
-      {/* ── Nav ─────────────────────────────────────────────── */}
-      <header className="rf-home__nav">
-        <Link to="/" className="rf-home__brand">
-          <div className="rf-home__brand-mark">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                stroke="url(#home-grad)"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <defs>
-                <linearGradient id="home-grad" x1="2" y1="2" x2="22" y2="22">
-                  <stop stopColor="var(--color-primary-400)" />
-                  <stop offset="1" stopColor="var(--color-accent-400)" />
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
-          <span className="rf-home__brand-text">ResearchFlow AI</span>
-        </Link>
-        <div className="rf-home__nav-links">
-          <Button variant="ghost" size="sm" onClick={handleDemoLaunch} disabled={demoLoading}>
-            {demoLoading ? 'Loading Demo...' : 'Demo Login'}
-          </Button>
-          <Link to="/login">
-            <Button variant="ghost" size="sm">Sign In</Button>
-          </Link>
-          <Link to="/register">
-            <Button variant="primary" size="sm">Get Started</Button>
-          </Link>
-        </div>
-      </header>
+    <div className="an-landing-page">
+      {/* ── Active Theory Dual-Layer Custom Magnetic Cursor ── */}
+      <CustomCursor />
 
-      {/* ── Hero ────────────────────────────────────────────── */}
-      <section className="rf-home__hero">
-        <div className="rf-home__hero-bg">
-          <div className="rf-home__orb rf-home__orb--1" />
-          <div className="rf-home__orb rf-home__orb--2" />
-          <div className="rf-home__orb rf-home__orb--3" />
-        </div>
-        <div className="rf-home__hero-content animate-fade-in-up">
-          <span className="rf-home__pill">✨ AI-Powered Research Workflows</span>
-          <h1 className="rf-home__headline">
-            Accelerate your research<br />
-            with <span className="rf-home__gradient-text">intelligent automation</span>
-          </h1>
-          <p className="rf-home__subline">
-            ResearchFlow AI streamlines literature reviews, data analysis, and report
-            generation — so you can focus on breakthrough discoveries.
-          </p>
-          <div className="rf-home__cta">
-            <Link to="/register">
-              <Button size="lg">Start Free Trial</Button>
-            </Link>
-            <Button variant="secondary" size="lg" onClick={handleDemoLaunch} disabled={demoLoading} id="home-demo-btn">
-              {demoLoading ? 'Starting Workspace...' : '⚡ Launch Interactive Demo'}
-            </Button>
-          </div>
-        </div>
-      </section>
+      {/* ── Active Theory Studio HUD & Telemetry Layer ── */}
+      <ActiveTheoryHUD />
 
-      {/* ── Features ────────────────────────────────────────── */}
-      <section className="rf-home__features">
-        {[
-          {
-            icon: '🔬',
-            title: 'Smart Literature Review',
-            desc: 'AI reads and summarizes thousands of papers in minutes.',
-          },
-          {
-            icon: '📊',
-            title: 'Automated Analysis',
-            desc: 'Statistical modeling and visualization built right in.',
-          },
-          {
-            icon: '🤖',
-            title: 'AI Research Assistant',
-            desc: 'Ask questions, get cited answers from your corpus.',
-          },
-          {
-            icon: '📝',
-            title: 'Report Generation',
-            desc: 'Export publication-ready reports with one click.',
-          },
-        ].map((f) => (
-          <div className="rf-home__feature-card" key={f.title}>
-            <span className="rf-home__feature-icon">{f.icon}</span>
-            <h3 className="rf-home__feature-title">{f.title}</h3>
-            <p className="rf-home__feature-desc">{f.desc}</p>
-          </div>
-        ))}
-      </section>
+      {/* ── Minimalist Glass Navigation ── */}
+      <Navbar onDemoLaunch={handleDemoLaunch} demoLoading={demoLoading} />
+
+      {/* ── Kinetic Typography & 3D Vector Canvas Hero ── */}
+      <HeroSection onDemoLaunch={handleDemoLaunch} demoLoading={demoLoading} />
+
+      {/* ── Paradigm Shift (The 30 Tabs Problem) ── */}
+      <ProblemSection />
+
+      {/* ── 3D Interactive Knowledge Galaxy Sphere ── */}
+      <KnowledgeGalaxySection />
+
+      {/* ── Draggable Active Theory Experiments Reel ── */}
+      <ExperimentsReel />
+
+      {/* ── 8-Stage RAG Intelligence Pipeline ── */}
+      <RagPipelineSection />
+
+      {/* ── Live AI Agent Timeline Stream ── */}
+      <AgentTimelineSection />
+
+      {/* ── Floating Document Hub Experience ── */}
+      <DocumentExperienceSection />
+
+      {/* ── Grounded Chat Simulator & Provenance Inspector ── */}
+      <ChatDemoSection />
+
+      {/* ── Advanced Citations Engine ── */}
+      <CitationsSection />
+
+      {/* ── 3-Pane Research Operating System Preview ── */}
+      <WorkspacePreviewSection />
+
+      {/* ── Modular Intelligence Providers (NVIDIA, Gemini, Ollama) ── */}
+      <ProvidersSection />
+
+      {/* ── Full Technical Architecture Topology ── */}
+      <ArchitectureSection />
+
+      {/* ── Final Editorial CTA & Footer ── */}
+      <FinalCtaSection onDemoLaunch={handleDemoLaunch} demoLoading={demoLoading} />
     </div>
   );
 }

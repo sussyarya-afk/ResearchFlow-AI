@@ -265,7 +265,7 @@ class DocumentService:
                 logger.error(f"Chunking/indexing failed for document {db_doc.id}: {chunk_err}", exc_info=True)
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail="Document upload succeeded, but text indexing failed.",
+                    detail=f"Document upload succeeded, but text indexing failed: {str(chunk_err)}",
                 ) from chunk_err
 
         except HTTPException:

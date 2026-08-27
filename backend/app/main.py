@@ -43,7 +43,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version="1.0.0",
-    description="Backend API for ResearchFlow AI",
+    description="Backend API for AgentNotebook AI",
     lifespan=lifespan,
 )
 

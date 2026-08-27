@@ -1,0 +1,106 @@
+/* ── Active Theory Custom Liquid Magnetic Cursor ───────────── */
+
+.an-cursor-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 99999;
+  overflow: hidden;
+}
+
+/* Precision Center Dot */
+.an-cursor-dot {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 10px #38bdf8, 0 0 20px rgba(56, 189, 248, 0.6);
+  pointer-events: none;
+  will-change: transform;
+  transition: transform 0.05s linear, opacity 0.2s ease, width 0.2s ease, height 0.2s ease;
+}
+
+/* Trailing Inertial Fluid Ring */
+.an-cursor-ring {
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  background: rgba(56, 189, 248, 0.03);
+  pointer-events: none;
+  will-change: transform;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              height 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.2s ease,
+              background 0.2s ease,
+              top 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              left 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.an-cursor-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #38bdf8;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(2px);
+  transition: all 0.2s ease;
+}
+
+/* Hovering over Interactive Component */
+.an-cursor--hover .an-cursor-ring {
+  top: -30px;
+  left: -30px;
+  width: 60px;
+  height: 60px;
+  border-color: rgba(56, 189, 248, 0.8);
+  background: rgba(56, 189, 248, 0.08);
+  box-shadow: 0 0 25px rgba(56, 189, 248, 0.3), inset 0 0 15px rgba(56, 189, 248, 0.15);
+}
+
+.an-cursor--hover .an-cursor-dot {
+  transform: scale(0.5);
+  background: #ffffff;
+}
+
+.an-cursor--hover .an-cursor-label {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Active Click State */
+.an-cursor--active .an-cursor-ring {
+  top: -15px;
+  left: -15px;
+  width: 30px;
+  height: 30px;
+  border-color: #818cf8;
+  background: rgba(129, 140, 248, 0.2);
+  box-shadow: 0 0 20px rgba(129, 140, 248, 0.6);
+}
+
+.an-cursor--active .an-cursor-dot {
+  background: #c084fc;
+  box-shadow: 0 0 12px #c084fc;
+}
+
+@media (pointer: coarse) {
+  .an-cursor-wrapper {
+    display: none;
+  }
+}

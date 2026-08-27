@@ -1,0 +1,197 @@
+/* ── Active Theory Studio HUD Overlay ──────────────────────── */
+
+.an-hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: rgba(148, 163, 184, 0.5);
+  user-select: none;
+}
+
+/* 4-Corner Precision Brackets */
+.an-hud__bracket {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 20px;
+}
+
+.an-hud__bracket--tl {
+  top: 0;
+  left: 0;
+}
+
+.an-hud__bracket--tr {
+  top: 0;
+  right: 0;
+}
+
+.an-hud__bracket--bl {
+  bottom: 32px;
+  left: 0;
+}
+
+.an-hud__bracket--br {
+  bottom: 32px;
+  right: 0;
+}
+
+.an-hud__crosshair {
+  color: #38bdf8;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
+}
+
+.an-hud__tag {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 9px;
+  font-weight: 600;
+}
+
+/* Vertical Side Telemetry */
+.an-hud__side {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 9px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.2);
+  white-space: nowrap;
+}
+
+.an-hud__side--left {
+  left: -90px;
+  transform-origin: center center;
+}
+
+.an-hud__side--right {
+  right: -90px;
+  transform: translateY(-50%) rotate(90deg);
+  transform-origin: center center;
+}
+
+.an-hud__side-divider {
+  width: 16px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Bottom Telemetry Bar */
+.an-hud__bottom-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 32px;
+  background: rgba(3, 4, 8, 0.9);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  pointer-events: auto;
+}
+
+.an-hud__stat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.an-hud__icon {
+  color: #38bdf8;
+}
+
+.an-hud__icon--pulse {
+  color: #34d399;
+  animation: hudPulse 2s ease-in-out infinite;
+}
+
+@keyframes hudPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; text-shadow: 0 0 8px #34d399; }
+}
+
+/* Audio Button & Equalizer */
+.an-hud__audio-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border-radius: var(--radius-xs);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.6);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: all var(--transition-fast);
+}
+
+.an-hud__audio-btn:hover {
+  background: rgba(56, 189, 248, 0.1);
+  border-color: rgba(56, 189, 248, 0.3);
+  color: #38bdf8;
+}
+
+.an-hud__audio-btn--active {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
+}
+
+.an-hud__eq {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 10px;
+}
+
+.an-eq-bar {
+  width: 2px;
+  height: 2px;
+  background: #38bdf8;
+  border-radius: 1px;
+  transition: height 0.15s ease;
+}
+
+.an-hud__eq--playing .an-eq-bar:nth-child(1) { animation: eqBounce 0.6s ease infinite alternate; }
+.an-hud__eq--playing .an-eq-bar:nth-child(2) { animation: eqBounce 0.4s ease 0.1s infinite alternate; }
+.an-hud__eq--playing .an-eq-bar:nth-child(3) { animation: eqBounce 0.7s ease 0.2s infinite alternate; }
+.an-hud__eq--playing .an-eq-bar:nth-child(4) { animation: eqBounce 0.5s ease 0.15s infinite alternate; }
+.an-hud__eq--playing .an-eq-bar:nth-child(5) { animation: eqBounce 0.8s ease 0.05s infinite alternate; }
+
+@keyframes eqBounce {
+  0% { height: 2px; }
+  100% { height: 10px; }
+}
+
+@media (max-width: 900px) {
+  .an-hud__side {
+    display: none;
+  }
+  .an-hud__stat-item--clock {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .an-hud__bracket {
+    display: none;
+  }
+}

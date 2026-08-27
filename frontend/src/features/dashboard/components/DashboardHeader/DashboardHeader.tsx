@@ -140,8 +140,8 @@ export function DashboardHeader() {
             <div className="rf-dashboard-header__dropdown rf-dashboard-header__dropdown--profile animate-scale-in">
               <div className="rf-profile-menu__header">
                 <p className="rf-profile-menu__name">{displayName}</p>
-                <p className="rf-profile-menu__email">{user?.email || 'demo@researchflow.ai'}</p>
-                <span className="rf-profile-menu__org">{user?.organization || 'Research Labs AI'}</span>
+                <p className="rf-profile-menu__email">{user?.email || 'demo@agentnotebook.ai'}</p>
+                <span className="rf-profile-menu__org">{user?.organization || 'AgentNotebook Research Lab'}</span>
               </div>
               <div className="rf-profile-menu__divider" />
               <Link
