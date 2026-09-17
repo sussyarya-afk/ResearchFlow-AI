@@ -14,19 +14,11 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: FRONTEND_ORIGINS
-        value: "*" # Update this with your actual frontend URL once deployed
+        value: "*"
       - key: LLM_PROVIDER
         value: gemini
       - key: GEMINI_API_KEY
         sync: false
-    # ChromaDB and PDF uploads require persistent storage
-    # Render provides one disk per service, so we mount it and symlink the folders
-    disk:
-      name: data
-      mountPath: /opt/render/project/data
-      sizeGB: 1
-    preDeployCommand: "mkdir -p /opt/render/project/data/chroma_db /opt/render/project/data/uploads && ln -sfn /opt/render/project/data/chroma_db backend/chroma_db && ln -sfn /opt/render/project/data/uploads backend/uploads && cd backend && pip install -r requirements.txt && alembic upgrade head"
-    startCommand: "cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
 
 databases:
   - name: researchflow-db
