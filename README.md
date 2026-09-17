@@ -11,6 +11,11 @@ AgentNotebook AI is a high-performance research operating system built with Fast
 - Frontend: React, Vite, TypeScript, three-panel workspace UI, streaming chat, citations, project dashboard.
 - Persistence: PostgreSQL stores users, projects, documents, chunks, chat history, citations, and notes. ChromaDB stores chunk vectors and retrieval metadata. Uploaded PDFs live on disk or a mounted volume.
 
+## Deployment
+
+**Production Backend (Vercel Deployment):**
+[https://research-flow-ai-fiqq-eight.vercel.app](https://research-flow-ai-fiqq-eight.vercel.app)
+
 ## RAG Flow
 
 PDF upload -> PyMuPDF page extraction -> paragraph-aware chunks -> sentence-transformer embeddings -> ChromaDB upsert with project/document/page metadata -> query embedding -> ChromaDB filtered retrieval -> grounded prompt -> selected LLM provider -> streamed answer -> citations saved with chat history.
