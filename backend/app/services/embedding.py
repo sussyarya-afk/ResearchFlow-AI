@@ -11,7 +11,7 @@ class EmbeddingService:
     """Service for generating semantic embeddings using Google Gemini."""
     
     def __init__(self):
-        self.model_name = "text-embedding-004"
+        self.model_name = "gemini-embedding-2"
         self.expected_dimension = 768
         self.client = None
 
