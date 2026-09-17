@@ -6,6 +6,53 @@ Pure-function utility with no external dependencies beyond Python stdlib.
 
 import re
 import unicodedata
+from typing import List
+
+
+# ── Page marker patterns ───────────────────────────────────────────────────────
+# Matches common PDF page number/header artifacts:
+#   "Page | 32"  "Page|32"  "32 | Page"  "| 32 |"  "Page 32"  "P a g e | 3 2"
+_PAGE_MARKER_PATTERNS = [
+    re.compile(r'(?i)page\s*\|\s*\d+'),          # "Page | 32"
+    re.compile(r'(?i)\|\s*page\s*\d*'),           # "| Page 32"
+    re.compile(r'(?i)page\s+\d+\s*$', re.M),     # "Page 32" at end of line
+    re.compile(r'(?i)^\s*\d+\s*\|\s*page', re.M),# "32 | Page"
+    re.compile(r'(?i)^\s*-\s*\d+\s*-\s*$', re.M),# "- 32 -"
+    re.compile(r'(?i)^\s*\[\s*\d+\s*\]\s*$', re.M),# "[32]"
+]
+
+# Minimum characters a line must have to be preserved (filters lone numbers,
+# decorative separators, and near-empty lines that are just PDF artifacts).
+_MIN_LINE_LENGTH = 3
+
+
+def _strip_page_markers(text: str) -> str:
+    """Remove common PDF page number marker patterns from text."""
+    for pattern in _PAGE_MARKER_PATTERNS:
+        text = pattern.sub('', text)
+    return text
+
+
+def _strip_repeated_short_lines(lines: List[str]) -> List[str]:
+    """
+    Identify lines that appear repeatedly across the document (likely
+    headers/footers) and remove them.  Only removes lines that are short
+    (<=80 chars) and appear more than twice, to avoid removing real content.
+    """
+    from collections import Counter
+    # Count occurrences of stripped versions of short lines
+    line_counts: Counter = Counter()
+    for line in lines:
+        stripped = line.strip()
+        if 0 < len(stripped) <= 80:
+            line_counts[stripped] += 1
+
+    # Build a set of repeated lines to remove (appears 3+ times)
+    repeated = {line for line, count in line_counts.items() if count >= 3}
+    if not repeated:
+        return lines
+
+    return [line for line in lines if line.strip() not in repeated]
 
 
 def clean_text(raw: str) -> str:
@@ -16,10 +63,12 @@ def clean_text(raw: str) -> str:
       1. Normalize Unicode (NFKC) — ligatures (ﬁ→fi), smart quotes, etc.
       2. Remove NULL bytes and control characters (except newlines/tabs).
       3. Fix hyphenated line breaks (e.g. "quan-\\ntum" → "quantum").
-      4. Collapse runs of whitespace within lines to single spaces.
-      5. Strip trailing whitespace per line.
-      6. Normalize multiple blank lines into paragraph breaks (\\n\\n).
-      7. Strip leading/trailing whitespace from entire result.
+      4. Strip PDF page marker artifacts (e.g. "Page | 32").
+      5. Collapse runs of whitespace within lines to single spaces.
+      6. Strip trailing whitespace per line.
+      7. Remove lines that are purely numeric or only punctuation/symbols.
+      8. Normalize multiple blank lines into paragraph breaks (\\n\\n).
+      9. Strip leading/trailing whitespace from entire result.
     """
     if not raw:
         return ""
@@ -36,19 +85,32 @@ def clean_text(raw: str) -> str:
     # 4. Normalize line endings
     text = text.replace("\r\n", "\n").replace("\r", "\n")
 
-    # 5. Process line by line: collapse internal whitespace, strip trailing
+    # 4b. Strip PDF page marker artifacts
+    text = _strip_page_markers(text)
+
+    # 5. Process line by line
     lines = []
     for line in text.split("\n"):
         # Collapse tabs and multiple spaces to single space
         line = re.sub(r"[ \t]+", " ", line)
-        lines.append(line.rstrip())
+        line = line.rstrip()
+
+        # Skip lines that are purely numeric (page numbers, section numbers)
+        stripped = line.strip()
+        if stripped and re.match(r'^[\d\s\.\-–—|]+$', stripped):
+            continue
+
+        lines.append(line)
+
+    # 6. Remove repeated short lines (headers/footers)
+    lines = _strip_repeated_short_lines(lines)
 
     text = "\n".join(lines)
 
-    # 6. Collapse 3+ consecutive newlines into paragraph break (\n\n)
+    # 7. Collapse 3+ consecutive newlines into paragraph break (\n\n)
     text = re.sub(r"\n{3,}", "\n\n", text)
 
-    # 7. Final trim
+    # 8. Final trim
     return text.strip()
 
 

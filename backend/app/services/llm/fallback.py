@@ -24,8 +24,6 @@ def synthesize_grounded_answer(query: str, retrieved_chunks: List[Dict[str, Any]
     highlights = []
     for chunk in retrieved_chunks[:4]:
         text = chunk.get("text", "").strip()
-        doc_name = chunk.get("document_name", "Document")
-        page_start = chunk.get("page_start", 1)
         if not text:
             continue
             
@@ -44,24 +42,20 @@ def synthesize_grounded_answer(query: str, retrieved_chunks: List[Dict[str, Any]
         
         excerpt = " ".join(top_sentences)
         if excerpt:
-            highlights.append({
-                "doc": doc_name,
-                "page": page_start,
-                "text": excerpt
-            })
+            highlights.append(excerpt)
 
     if not highlights:
         first_chunk = retrieved_chunks[0]
-        return f"Based on **{first_chunk.get('document_name', 'your document')}** (Page {first_chunk.get('page_start', 1)}):\n\n> {first_chunk.get('text', '')[:400]}..."
+        return f"{first_chunk.get('text', '')[:400]}..."
 
     response_lines = [
-        f"Based on the analysis of your documents regarding **\"{query}\"**:\n"
+        "### Summary\n",
+        "Here is the most relevant information extracted from your documents:\n"
     ]
 
-    for i, h in enumerate(highlights, 1):
-        response_lines.append(f"• **Key Finding [{i}]** (*{h['doc']}*, p. {h['page']}):\n  {h['text']}\n")
+    for excerpt in highlights:
+        response_lines.append(f"- {excerpt}\n")
 
-    response_lines.append("\n*Synthesized from retrieved document chunks with provenance verification.*")
     return "\n".join(response_lines)
 
 

@@ -17,7 +17,7 @@ class RetrievalService:
         self._healthy = False
         self.chroma_client = None
         self.collection = None
-        self.collection_name = "document_chunks"
+        self.collection_name = "document_chunks_gemini_768"
         self._init_chroma()
 
     def _init_chroma(self) -> None:
@@ -61,12 +61,10 @@ class RetrievalService:
 
         try:
             # Generate query embedding
-            query_embeddings = embedding_service.generate_embeddings([query])
-            if not query_embeddings:
+            query_embedding = embedding_service.generate_query_embedding(query)
+            if not query_embedding:
                 logger.warning("Embedding service returned empty result for query.")
                 return []
-
-            query_embedding = query_embeddings[0]
 
             # Query ChromaDB, filtered by project_id
             results = self.collection.query(

@@ -14,7 +14,7 @@ from uuid import UUID
 
 logger = logging.getLogger(__name__)
 
-COLLECTION_NAME = "document_chunks"
+COLLECTION_NAME = "document_chunks_gemini_768"
 
 
 class ChromaEmbeddingStore:

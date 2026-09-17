@@ -26,11 +26,10 @@ python-dotenv
 pymupdf
 
 # ── Embeddings ────────────────────────────────────────────────────────────────
-sentence-transformers
 
 # ── Vector store ──────────────────────────────────────────────────────────────
 chromadb
 
 # ── LLM providers ────────────────────────────────────────────────────────────
-google-generativeai
+google-genai
 httpx

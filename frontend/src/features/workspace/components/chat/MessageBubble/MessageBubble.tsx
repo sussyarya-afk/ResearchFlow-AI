@@ -1,4 +1,6 @@
 import { Bot, User } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import type { ChatMessage } from '../../../types';
 import { AgentTimeline } from '../../timeline/AgentTimeline';
 import { CitationCard } from '../../citations/CitationCard';
@@ -10,20 +12,6 @@ interface MessageBubbleProps {
   timeline?: AgentTimelineType;
   isLatestAI?: boolean;
   onOpenDocument?: (documentId: string, pageNumber: number) => void;
-}
-
-function formatContent(content: string) {
-  // Convert markdown-style bold **text** to <strong>
-  const parts = content.split(/(\*\*[^*]+\*\*)/g);
-  return parts.map((part, i) => {
-    if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={i}>{part.slice(2, -2)}</strong>;
-    }
-    // Split on newlines and render as paragraphs
-    return part.split('\n\n').map((para, j) => (
-      para.trim() ? <p key={`${i}-${j}`} className="rf-msg__para">{para}</p> : null
-    ));
-  });
 }
 
 export function MessageBubble({ message, timeline, isLatestAI, onOpenDocument }: MessageBubbleProps) {
@@ -42,7 +30,15 @@ export function MessageBubble({ message, timeline, isLatestAI, onOpenDocument }:
         </div>
 
         <div className={`rf-msg__bubble rf-msg__bubble--${message.role}`}>
-          {formatContent(message.content)}
+          {isUser ? (
+            <p className="rf-msg__para">{message.content}</p>
+          ) : (
+            <div className="rf-msg__markdown">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {message.content}
+              </ReactMarkdown>
+            </div>
+          )}
         </div>
 
         {/* Agent timeline directly below the LATEST AI response */}

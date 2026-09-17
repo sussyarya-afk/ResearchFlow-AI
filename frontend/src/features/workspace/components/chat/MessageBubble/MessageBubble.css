@@ -107,3 +107,101 @@
   width: 100%;
   margin-top: var(--space-2);
 }
+
+/* ── Markdown Styles ── */
+.rf-msg__markdown {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.rf-msg__markdown p {
+  margin: 0;
+}
+
+.rf-msg__markdown h1,
+.rf-msg__markdown h2,
+.rf-msg__markdown h3,
+.rf-msg__markdown h4 {
+  margin: var(--space-2) 0 var(--space-1);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.3;
+}
+
+.rf-msg__markdown h1 { font-size: 1.25em; }
+.rf-msg__markdown h2 { font-size: 1.15em; }
+.rf-msg__markdown h3 { font-size: 1.05em; }
+
+.rf-msg__markdown ul,
+.rf-msg__markdown ol {
+  margin: 0;
+  padding-left: var(--space-4);
+}
+
+.rf-msg__markdown li {
+  margin-bottom: var(--space-1);
+}
+
+.rf-msg__markdown a {
+  color: var(--color-primary-400);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.rf-msg__markdown a:hover {
+  color: var(--color-primary-300);
+}
+
+.rf-msg__markdown blockquote {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-left: 3px solid var(--color-primary-500);
+  background: var(--glass-bg-hover);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.rf-msg__markdown code {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.9em;
+  color: var(--color-accent-400);
+}
+
+.rf-msg__markdown pre {
+  background: rgba(0, 0, 0, 0.3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  margin: 0;
+  border: 1px solid var(--color-border-default);
+}
+
+.rf-msg__markdown pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  font-size: 0.85em;
+}
+
+.rf-msg__markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--space-2) 0;
+}
+
+.rf-msg__markdown th,
+.rf-msg__markdown td {
+  border: 1px solid var(--color-border-default);
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+}
+
+.rf-msg__markdown th {
+  background: var(--glass-bg-hover);
+  font-weight: var(--font-weight-semibold);
+}

@@ -293,7 +293,7 @@ class ChunkService:
 
         start_embed = time.time()
         try:
-            embeddings = await asyncio.to_thread(embedding_service.generate_embeddings, texts)
+            embeddings = await asyncio.to_thread(embedding_service.generate_document_embeddings, texts)
         except Exception as exc:
             err_msg = f"Embedding generation failed for document {document_id}: {exc}"
             logger.error(err_msg, exc_info=True)
