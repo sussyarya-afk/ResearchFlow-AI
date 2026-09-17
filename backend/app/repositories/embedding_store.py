@@ -31,8 +31,14 @@ class ChromaEmbeddingStore:
 
     def _init(self) -> None:
         try:
+            import os
             import chromadb
-            self._client = chromadb.PersistentClient(path="./chroma_db")
+            
+            if os.environ.get("VERCEL") == "1":
+                self._client = chromadb.EphemeralClient()
+            else:
+                self._client = chromadb.PersistentClient(path="./chroma_db")
+                
             self._collection = self._client.get_or_create_collection(
                 name=COLLECTION_NAME,
                 metadata={"hnsw:space": "cosine"},

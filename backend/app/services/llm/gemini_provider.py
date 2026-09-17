@@ -1,7 +1,7 @@
 import logging
 import asyncio
 from typing import AsyncGenerator, Dict, Any
-import google.generativeai as genai
+from google import genai
 
 from app.core.config import settings
 from app.services.llm.base import BaseLLMProvider
@@ -15,11 +15,10 @@ class GeminiProvider(BaseLLMProvider):
         self.api_key = settings.GEMINI_API_KEY.strip() if settings.GEMINI_API_KEY else ""
 
         if self.api_key:
-            genai.configure(api_key=self.api_key)
-            self.model = genai.GenerativeModel(self._model_name)
+            self.client = genai.Client(api_key=self.api_key)
         else:
             logger.warning("GEMINI_API_KEY is not set. Gemini is not configured.")
-            self.model = None
+            self.client = None
 
     @property
     def provider_name(self) -> str:
@@ -51,14 +50,17 @@ class GeminiProvider(BaseLLMProvider):
             }
 
     async def generate(self, prompt: str, timeout: int = 30) -> str:
-        if not self.api_key or not self.model:
+        if not self.api_key or not self.client:
             raise RuntimeError("Gemini provider is not configured. Set GEMINI_API_KEY.")
 
         logger.info(f"Generating Gemini response, model: {self.model_name}, prompt len: {len(prompt)}")
         try:
             loop = asyncio.get_running_loop()
             def _generate():
-                res = self.model.generate_content(prompt)
+                res = self.client.models.generate_content(
+                    model=self.model_name,
+                    contents=prompt
+                )
                 return res.text
             
             task = loop.run_in_executor(None, _generate)
@@ -72,12 +74,15 @@ class GeminiProvider(BaseLLMProvider):
             raise RuntimeError("Gemini response generation failed.") from e
 
     async def generate_stream(self, prompt: str) -> AsyncGenerator[str, None]:
-        if not self.api_key or not self.model:
+        if not self.api_key or not self.client:
             raise RuntimeError("Gemini provider is not configured. Set GEMINI_API_KEY.")
 
         logger.info(f"Starting Gemini stream, model: {self.model_name}, prompt len: {len(prompt)}")
         try:
-            response_stream = await self.model.generate_content_async(prompt, stream=True)
+            response_stream = await self.client.aio.models.generate_content_stream(
+                model=self.model_name,
+                contents=prompt
+            )
             async for chunk in response_stream:
                 if chunk.text:
                     yield chunk.text

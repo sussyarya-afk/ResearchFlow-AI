@@ -77,7 +77,7 @@ async def health_check():
     vector_status = "healthy" if retrieval_service._healthy else "error"
     provider = LLMFactory.get_provider()
     provider_status = await provider.check_connection()
-    critical_ok = db_status == "connected" and vector_status == "healthy" and embedding_service.model is not None
+    critical_ok = db_status == "connected" and vector_status == "healthy" and embedding_service.client is not None
 
     return JSONResponse({
         "status": "ok" if critical_ok else "degraded",
@@ -85,7 +85,7 @@ async def health_check():
         "database": db_status,
         "vector_store": vector_status,
         "embedding_model": {
-            "loaded": embedding_service.model is not None,
+            "loaded": embedding_service.client is not None,
             "name": embedding_service.model_name,
         },
         "llm_provider": provider.provider_name,

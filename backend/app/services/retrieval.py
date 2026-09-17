@@ -23,9 +23,14 @@ class RetrievalService:
     def _init_chroma(self) -> None:
         """Attempt to connect to ChromaDB. Sets _healthy flag accordingly."""
         try:
+            import os
             import chromadb
 
-            self.chroma_client = chromadb.PersistentClient(path="./chroma_db")
+            if os.environ.get("VERCEL") == "1":
+                self.chroma_client = chromadb.EphemeralClient()
+            else:
+                self.chroma_client = chromadb.PersistentClient(path="./chroma_db")
+                
             self.collection = self.chroma_client.get_or_create_collection(
                 name=self.collection_name,
                 metadata={"hnsw:space": "cosine"},

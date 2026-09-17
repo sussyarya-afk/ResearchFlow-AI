@@ -102,11 +102,8 @@ class LLMFactory:
         cls._initialize_providers()
         p_id = provider_id.lower()
         if p_id == "gemini":
-            import google.generativeai as genai
             settings.GEMINI_API_KEY = key_or_url.strip()
-            if key_or_url.strip():
-                genai.configure(api_key=key_or_url.strip())
-                cls._providers["gemini"] = GeminiProvider()
+            cls._providers["gemini"] = GeminiProvider()
         elif p_id == "nvidia":
             settings.NVIDIA_API_KEY = key_or_url.strip()
             cls._providers["nvidia"] = NvidiaProvider()
